@@ -1,0 +1,109 @@
+{
+  "type": "object",
+  "properties": {
+    "legivel": {
+      "type": "boolean",
+      "description": "false quando a foto não permite qualquer análise"
+    },
+    "especie": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "comum": {
+          "type": "string"
+        },
+        "cientifico": {
+          "type": "string"
+        },
+        "confianca": {
+          "type": "number",
+          "description": "de 0 a 1, honesto e nao inflado"
+        }
+      },
+      "required": [
+        "comum",
+        "cientifico",
+        "confianca"
+      ],
+      "additionalProperties": false
+    },
+    "saude": {
+      "type": "string",
+      "enum": [
+        "saudavel",
+        "atencao",
+        "problema"
+      ]
+    },
+    "diagnostico": {
+      "type": "array",
+      "description": "no maximo 3 causas, uma hipotese por item, da mais provavel para a menos",
+      "items": {
+        "type": "object",
+        "properties": {
+          "causa": {
+            "type": "string"
+          },
+          "probabilidade": {
+            "type": "string",
+            "enum": [
+              "alta",
+              "media",
+              "baixa"
+            ]
+          },
+          "sinais": {
+            "type": "string"
+          },
+          "acao": {
+            "type": "string"
+          },
+          "marcacao": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "onde o sintoma aparece na foto, ou null",
+            "properties": {
+              "x": {
+                "type": "number",
+                "description": "centro horizontal, 0 a 1"
+              },
+              "y": {
+                "type": "number",
+                "description": "centro vertical, 0 a 1, topo e 0"
+              },
+              "raio": {
+                "type": "number",
+                "description": "fracao da largura, 0.08 a 0.20"
+              }
+            },
+            "required": [
+              "x",
+              "y",
+              "raio"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "causa",
+          "probabilidade",
+          "sinais",
+          "acao",
+          "marcacao"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "legivel",
+    "especie",
+    "saude",
+    "diagnostico"
+  ],
+  "additionalProperties": false
+}

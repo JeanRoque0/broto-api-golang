@@ -1,0 +1,60 @@
+name: Build and deploy
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+jobs:
+  checks:
+    uses: ./.github/workflows/ci.yml
+  deploy:
+    needs: checks
+    if: github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+      ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+      ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+      ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+      ECS_TASK_FAMILY: ${{ vars.ECS_TASK_FAMILY }}
+      ECS_MIGRATION_FAMILY: ${{ vars.ECS_MIGRATION_FAMILY }}
+      ECS_CAPACITY_PROVIDER: ${{ vars.ECS_CAPACITY_PROVIDER }}
+      DB_APP_SECRET_ARN: ${{ vars.DB_APP_SECRET_ARN }}
+      ECS_MIN_TASKS: ${{ vars.ECS_MIN_TASKS }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: aws-actions/configure-aws-credentials@ff717079ee2060e4bcee96c4779b553acc87447c # v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: broto-github-deploy
+      - name: Build immutable image (reuse existing commit on retries)
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${ECR_REGISTRY:?}" "${ECR_REPOSITORY:?}"
+          tag="git-${GITHUB_SHA}"
+          image="${ECR_REGISTRY}/${ECR_REPOSITORY}:${tag}"
+          if aws ecr describe-images --repository-name "$ECR_REPOSITORY" --image-ids "imageTag=$tag" > /tmp/image.json 2> /tmp/image.error; then
+            echo 'Reusing immutable image for this commit'
+          else
+            if ! grep -q ImageNotFoundException /tmp/image.error; then cat /tmp/image.error; exit 1; fi
+            aws ecr get-login-password | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+            docker build --platform linux/amd64 --target production --tag "$image" .
+            docker push "$image"
+            aws ecr describe-images --repository-name "$ECR_REPOSITORY" --image-ids "imageTag=$tag" > /tmp/image.json
+          fi
+          digest=$(jq -r '.imageDetails[0].imageDigest' /tmp/image.json)
+          echo "IMAGE_URI=${ECR_REGISTRY}/${ECR_REPOSITORY}@${digest}" >> "$GITHUB_ENV"
+      - name: Migrate, deploy and verify no rollback occurred
+        run: python3 scripts/deploy/deploy.py

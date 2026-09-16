@@ -1,0 +1,380 @@
+{
+  "source_commit": "c56e17e50897e576297a015d1a7a661288bca022",
+  "source_sha256": {
+    "src/types/profile.ts": "bb1926ec95103de0409149bce7b382488e6f9975e6d80273c4d718f8c9af362a",
+    "src/types/plant.ts": "1fb3f8d20f9a8e0ccef07d80b6804e150896f6c690b3d14a303935c9e10048d0",
+    "src/services/supabase/chat.ts": "6fe8ebf045c7b79b7b2cdcaa195b4c643a553610b65b3c0e4766e0518b109eae"
+  },
+  "interfaces": {
+    "Profile": {
+      "id": {
+        "type": "string",
+        "nullable": false
+      },
+      "display_name": {
+        "type": "string",
+        "nullable": true
+      },
+      "avatar_path": {
+        "type": "string",
+        "nullable": true
+      },
+      "plan": {
+        "type": "string",
+        "nullable": false
+      },
+      "plan_period": {
+        "type": "string",
+        "nullable": true
+      },
+      "plan_expires_at": {
+        "type": "string",
+        "nullable": true
+      },
+      "free_used": {
+        "type": "number",
+        "nullable": false
+      },
+      "period_start": {
+        "type": "string",
+        "nullable": false
+      },
+      "welcome_credits": {
+        "type": "number",
+        "nullable": false
+      },
+      "analyses_month": {
+        "type": "number",
+        "nullable": false
+      },
+      "analyses_today": {
+        "type": "number",
+        "nullable": false
+      },
+      "analyses_day": {
+        "type": "string",
+        "nullable": false
+      },
+      "chat_period": {
+        "type": "string",
+        "nullable": true
+      },
+      "chat_expires_at": {
+        "type": "string",
+        "nullable": true
+      },
+      "chat_month": {
+        "type": "number",
+        "nullable": false
+      },
+      "chat_today": {
+        "type": "number",
+        "nullable": false
+      },
+      "chat_day": {
+        "type": "string",
+        "nullable": false
+      },
+      "ad_credits": {
+        "type": "number",
+        "nullable": false
+      },
+      "paid_credits": {
+        "type": "number",
+        "nullable": false
+      },
+      "ads_today": {
+        "type": "number",
+        "nullable": false
+      },
+      "ads_today_date": {
+        "type": "string",
+        "nullable": false
+      },
+      "accepted_terms_at": {
+        "type": "string",
+        "nullable": true
+      },
+      "terms_version": {
+        "type": "string",
+        "nullable": true
+      },
+      "revoked_terms_at": {
+        "type": "string",
+        "nullable": true
+      },
+      "dismissed_announcement": {
+        "type": "string",
+        "nullable": true
+      },
+      "accepted_tips": {
+        "type": "boolean",
+        "nullable": false
+      },
+      "accepted_tips_at": {
+        "type": "string",
+        "nullable": true
+      },
+      "timezone": {
+        "type": "string",
+        "nullable": true
+      },
+      "language": {
+        "type": "string",
+        "nullable": true
+      },
+      "last_seen_at": {
+        "type": "string",
+        "nullable": true
+      },
+      "temperature_unit": {
+        "type": "string",
+        "nullable": true
+      },
+      "reminder_time": {
+        "type": "string",
+        "nullable": true
+      },
+      "notifications_enabled": {
+        "type": "boolean",
+        "nullable": false
+      },
+      "created_at": {
+        "type": "string",
+        "nullable": false
+      }
+    },
+    "Plant": {
+      "id": {
+        "type": "string",
+        "nullable": false
+      },
+      "user_id": {
+        "type": "string",
+        "nullable": false
+      },
+      "nickname": {
+        "type": "string",
+        "nullable": false
+      },
+      "species_scientific": {
+        "type": "string",
+        "nullable": true
+      },
+      "species_common": {
+        "type": "string",
+        "nullable": true
+      },
+      "photo_path": {
+        "type": "string",
+        "nullable": true
+      },
+      "room": {
+        "type": "string",
+        "nullable": true
+      },
+      "group_id": {
+        "type": "string",
+        "nullable": true
+      },
+      "watering_interval_days": {
+        "type": "number",
+        "nullable": true
+      },
+      "light": {
+        "type": "string",
+        "nullable": true
+      },
+      "fertilizer": {
+        "type": "string",
+        "nullable": true
+      },
+      "light_note": {
+        "type": "string",
+        "nullable": true
+      },
+      "fertilizer_note": {
+        "type": "string",
+        "nullable": true
+      },
+      "toxic_to_pets": {
+        "type": "boolean",
+        "nullable": true
+      },
+      "mist_days": {
+        "type": "number",
+        "nullable": true
+      },
+      "rotate_days": {
+        "type": "number",
+        "nullable": true
+      },
+      "repot_months": {
+        "type": "number",
+        "nullable": true
+      },
+      "prune_month": {
+        "type": "number",
+        "nullable": true
+      },
+      "temp_min_c": {
+        "type": "number",
+        "nullable": true
+      },
+      "temp_max_c": {
+        "type": "number",
+        "nullable": true
+      },
+      "care_notes": {
+        "type": "string",
+        "nullable": true
+      },
+      "last_watered_at": {
+        "type": "string",
+        "nullable": true
+      },
+      "notify_watering": {
+        "type": "boolean",
+        "nullable": false
+      },
+      "archived_at": {
+        "type": "string",
+        "nullable": true
+      },
+      "created_at": {
+        "type": "string",
+        "nullable": false
+      },
+      "updated_at": {
+        "type": "string",
+        "nullable": false
+      }
+    },
+    "PlantGroup": {
+      "id": {
+        "type": "string",
+        "nullable": false
+      },
+      "user_id": {
+        "type": "string",
+        "nullable": false
+      },
+      "name": {
+        "type": "string",
+        "nullable": false
+      },
+      "created_at": {
+        "type": "string",
+        "nullable": false
+      }
+    },
+    "PlantTask": {
+      "id": {
+        "type": "string",
+        "nullable": false
+      },
+      "plant_id": {
+        "type": "string",
+        "nullable": false
+      },
+      "user_id": {
+        "type": "string",
+        "nullable": false
+      },
+      "kind": {
+        "type": "string",
+        "nullable": false
+      },
+      "interval_days": {
+        "type": "number",
+        "nullable": false
+      },
+      "next_at": {
+        "type": "string",
+        "nullable": false
+      },
+      "remind_at": {
+        "type": "string",
+        "nullable": true
+      },
+      "enabled": {
+        "type": "boolean",
+        "nullable": false
+      },
+      "created_at": {
+        "type": "string",
+        "nullable": false
+      }
+    },
+    "CareEvent": {
+      "id": {
+        "type": "string",
+        "nullable": false
+      },
+      "plant_id": {
+        "type": "string",
+        "nullable": false
+      },
+      "user_id": {
+        "type": "string",
+        "nullable": false
+      },
+      "kind": {
+        "type": "string",
+        "nullable": false
+      },
+      "note": {
+        "type": "string",
+        "nullable": true
+      },
+      "happened_at": {
+        "type": "string",
+        "nullable": false
+      }
+    },
+    "ChatThread": {
+      "id": {
+        "type": "string",
+        "nullable": false
+      },
+      "plant_id": {
+        "type": "string",
+        "nullable": true
+      },
+      "title": {
+        "type": "string",
+        "nullable": true
+      },
+      "created_at": {
+        "type": "string",
+        "nullable": false
+      },
+      "last_message_at": {
+        "type": "string",
+        "nullable": false
+      }
+    },
+    "ChatMessage": {
+      "id": {
+        "type": "string",
+        "nullable": false
+      },
+      "thread_id": {
+        "type": "string",
+        "nullable": false
+      },
+      "role": {
+        "type": "string",
+        "nullable": false
+      },
+      "content": {
+        "type": "string",
+        "nullable": false
+      },
+      "created_at": {
+        "type": "string",
+        "nullable": false
+      }
+    }
+  }
+}

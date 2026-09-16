@@ -1,0 +1,14 @@
+.git
+.env
+.env.*
+data
+bin
+*.dump
+__pycache__
+*.tar.gz
+infra
+.github
+*.tfstate*
+*.tfvars
+*.tfplan
+*.secrets.json

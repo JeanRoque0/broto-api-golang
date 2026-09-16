@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "como_confirmar": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "causa": {
+            "type": "string"
+          },
+          "teste": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "causa",
+          "teste"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "como_confirmar"
+  ],
+  "additionalProperties": false
+}

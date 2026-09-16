@@ -1,0 +1,118 @@
+{
+  "type": "object",
+  "properties": {
+    "cuidados": {
+      "type": "object",
+      "properties": {
+        "rega_dias": {
+          "type": "integer",
+          "description": "intervalo entre regas, de 1 a 60 dias"
+        },
+        "luz": {
+          "type": "string",
+          "enum": [
+            "sol_direto",
+            "sol_parcial",
+            "luz_indireta",
+            "meia_sombra",
+            "sombra"
+          ]
+        },
+        "luz_nota": {
+          "type": "string",
+          "description": "uma frase completa com ponto final, ou vazio"
+        },
+        "adubo": {
+          "type": "string",
+          "enum": [
+            "quinzenal",
+            "mensal",
+            "bimestral",
+            "estacional",
+            "nao_precisa"
+          ]
+        },
+        "adubo_nota": {
+          "type": "string",
+          "description": "uma frase completa com ponto final, ou vazio"
+        },
+        "vaporizar_dias": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "intervalo entre vaporizações, de 1 a 15 dias; null quando a espécie não precisa"
+        },
+        "girar_dias": {
+          "type": "integer",
+          "description": "intervalo para girar o vaso, de 7 a 60 dias"
+        },
+        "replantar_meses": {
+          "type": "integer",
+          "description": "intervalo para trocar de vaso, de 6 a 48 meses"
+        },
+        "podar_mes": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "mês do ano em que a poda deve ser feita, de 1 a 12; null quando a espécie não é podada"
+        }
+      },
+      "required": [
+        "rega_dias",
+        "luz",
+        "luz_nota",
+        "adubo",
+        "adubo_nota",
+        "vaporizar_dias",
+        "girar_dias",
+        "replantar_meses",
+        "podar_mes"
+      ],
+      "additionalProperties": false
+    },
+    "toxica_para_pets": {
+      "type": "boolean"
+    },
+    "temperatura": {
+      "type": "object",
+      "properties": {
+        "min_c": {
+          "type": "integer",
+          "description": "menor temperatura confortável, em Celsius"
+        },
+        "max_c": {
+          "type": "integer",
+          "description": "maior temperatura confortável, em Celsius"
+        },
+        "nota": {
+          "type": "string",
+          "description": "uma frase completa com ponto final"
+        }
+      },
+      "required": [
+        "min_c",
+        "max_c",
+        "nota"
+      ],
+      "additionalProperties": false
+    },
+    "cultivo": {
+      "type": "string",
+      "description": "duas a quatro frases sobre como multiplicar e manter"
+    },
+    "simbolismo": {
+      "type": "string",
+      "description": "atribuição cultural declarada como atribuição, ou string vazia"
+    }
+  },
+  "required": [
+    "cuidados",
+    "toxica_para_pets",
+    "temperatura",
+    "cultivo",
+    "simbolismo"
+  ],
+  "additionalProperties": false
+}

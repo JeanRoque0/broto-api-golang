@@ -1,0 +1,74 @@
+name: broto
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: broto
+      POSTGRES_USER: broto
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Configure POSTGRES_PASSWORD em .env}
+      TZ: UTC
+    command: ["postgres", "-c", "shared_buffers=64MB", "-c", "max_connections=30", "-c", "max_wal_size=256MB", "-c", "min_wal_size=80MB"]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U broto -d broto"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    restart: unless-stopped
+    mem_limit: 384m
+    cpus: 1.0
+    logging: &logging
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgres://broto:${POSTGRES_PASSWORD}@db:5432/broto?sslmode=disable
+      HTTP_ADDR: :8080
+      SIGNING_KEY: ${SIGNING_KEY:?Configure SIGNING_KEY em .env}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:8080}
+      SITE_URL: ${SITE_URL:-http://localhost:3000}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      STORAGE_DIR: /data/photos
+      STORAGE_QUOTA_BYTES: ${STORAGE_QUOTA_BYTES:-536870912}
+      DEV_AUTO_CONFIRM: ${DEV_AUTO_CONFIRM:-false}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-}
+      FACTS_MODEL: ${FACTS_MODEL:-claude-haiku-4-5}
+      CHAT_MODEL: ${CHAT_MODEL:-claude-haiku-4-5}
+      CHAT_MAX_TOKENS: ${CHAT_MAX_TOKENS:-600}
+      ANTHROPIC_EFFORT: ${ANTHROPIC_EFFORT:-}
+      SEARCH_MODEL: ${SEARCH_MODEL:-claude-haiku-4-5}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_MIN_INTERVAL_SECONDS: ${SMTP_MIN_INTERVAL_SECONDS:-60}
+      GOOGLE_AUTH_ENABLED: ${GOOGLE_AUTH_ENABLED:-false}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_REDIRECT_URL: ${GOOGLE_REDIRECT_URL:-http://localhost:8080/v1/auth/google/callback}
+      GOOGLE_RETURN_URLS: ${GOOGLE_RETURN_URLS:-broto://auth-callback}
+    ports:
+      - "127.0.0.1:${PORT:-8080}:8080"
+    volumes:
+      - photos:/data/photos
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 256m
+    cpus: 1.0
+    logging: *logging
+volumes:
+  postgres_data:
+  photos:
