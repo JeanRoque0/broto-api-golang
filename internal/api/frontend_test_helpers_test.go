@@ -48,7 +48,7 @@ func newFrontendHarness(t *testing.T) *frontHarness {
 		t.Fatal(e)
 	}
 	u.Path = "/" + name
-	c := Config{DatabaseURL: u.String(), StorageDir: t.TempDir(), SigningKey: strings.Repeat("k", 32), DevAuth: true, StorageQuota: 1 << 20, PublicURL: "http://localhost:8080", Origins: "http://localhost:8081", AnthropicKey: "test-only", VisionModel: "vision-test", FactsModel: "facts-test", ChatModel: "chat-test"}
+	c := Config{DatabaseURL: u.String(), StorageDir: t.TempDir(), SigningKey: strings.Repeat("k", 32), DevAuth: true, StorageQuota: 1 << 20, PublicURL: "http://localhost:8080", Origins: "http://localhost:8081", DeepSeekKey: "test-only", VisionModel: "vision-test", FactsModel: "facts-test", ChatModel: "chat-test"}
 	s, e := New(ctx, c)
 	if e != nil {
 		t.Fatal(e)

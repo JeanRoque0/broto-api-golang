@@ -48,7 +48,7 @@ Os testes correspondentes foram executados antes das correções e reproduziram 
 
 ### Cliente HTTP e sessão primeiro
 
-Crie um cliente para `EXPO_PUBLIC_API_URL`. Mantenha a chave Anthropic e credenciais do PostgreSQL somente no backend. Remova o header `apikey` e `EXPO_PUBLIC_SUPABASE_ANON_KEY` desse cliente. É possível usar os aliases `/functions/v1/*` para IA ou apontar diretamente para `/v1/identify`, `/v1/chat`, `/v1/search`.
+Crie um cliente para `EXPO_PUBLIC_API_URL`. Mantenha a chave DeepSeek e credenciais do PostgreSQL somente no backend. Remova o header `apikey` e `EXPO_PUBLIC_SUPABASE_ANON_KEY` desse cliente. É possível usar os aliases `/functions/v1/*` para IA ou apontar diretamente para `/v1/identify`, `/v1/chat`, `/v1/search`.
 
 A função `signInWithEmail` atual apenas aguarda o SDK; quem atualiza o Zustand é `onAuthStateChange`. O adaptador novo deve gravar a sessão retornada, marcar hidratação e preservar a limpeza do React Query, análise e cache persistido no logout. O app também precisa verificar a sessão persistida ao reabrir e tratar 401, sem confiar apenas em `!!session` no armazenamento local.
 

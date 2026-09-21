@@ -8,7 +8,7 @@ import subprocess
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--smtp-to', help='Send exactly one SMTP message to this authorized recipient')
-parser.add_argument('--chat', action='store_true', help='Spend tokens on two real Anthropic chat turns')
+parser.add_argument('--chat', action='store_true', help='Spend tokens on two real DeepSeek chat turns')
 args = parser.parse_args()
 if not args.smtp_to and not args.chat:
     parser.error('specify --smtp-to and/or --chat; real services are never enabled implicitly')

@@ -45,7 +45,7 @@ type transportFunc func(*http.Request) (*http.Response, error)
 
 func (f transportFunc) RoundTrip(r *http.Request) (*http.Response, error) { return f(r) }
 func mockReply(text string) *http.Response {
-	b, _ := json.Marshal(map[string]any{"content": []any{map[string]string{"type": "text", "text": text}}, "stop_reason": "end_turn", "usage": map[string]int{"input_tokens": 10, "output_tokens": 10}})
+	b, _ := json.Marshal(map[string]any{"choices": []any{map[string]any{"message": map[string]string{"role": "assistant", "content": text}, "finish_reason": "stop"}}, "usage": map[string]int{"prompt_tokens": 10, "completion_tokens": 10}})
 	return &http.Response{StatusCode: 200, Body: io.NopCloser(bytes.NewReader(b)), Header: http.Header{}}
 }
 func TestIntegration(t *testing.T) {
@@ -69,7 +69,7 @@ func TestIntegration(t *testing.T) {
 		t.Fatal(e)
 	}
 	u.Path = "/" + name
-	c := Config{DatabaseURL: u.String(), StorageDir: t.TempDir(), SigningKey: strings.Repeat("x", 32), DevAuth: true, StorageQuota: 1024, PublicURL: "http://localhost:8080", Origins: "http://localhost:3000", AnthropicKey: "test", VisionModel: "test-vision", FactsModel: "test-facts", ChatModel: "test-chat", SearchModel: "test-search"}
+	c := Config{DatabaseURL: u.String(), StorageDir: t.TempDir(), SigningKey: strings.Repeat("x", 32), DevAuth: true, StorageQuota: 1024, PublicURL: "http://localhost:8080", Origins: "http://localhost:3000", DeepSeekKey: "test", VisionModel: "test-vision", FactsModel: "test-facts", ChatModel: "test-chat", SearchModel: "test-search"}
 	s, e := New(ctx, c)
 	if e != nil {
 		t.Fatal(e)
@@ -251,7 +251,7 @@ func TestIntegration(t *testing.T) {
 	// Search preserves result shape, filters SVG images, and caches normalized terms.
 	searches := 0
 	s.HTTP = &http.Client{Transport: transportFunc(func(r *http.Request) (*http.Response, error) {
-		if r.URL.Host == "api.anthropic.com" {
+		if r.URL.Host == "api.deepseek.com" {
 			searches++
 			return mockReply(`{"especies":[{"cientifico":"Epipremnum aureum","popular":"Jiboia"}]}`), nil
 		}

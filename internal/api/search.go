@@ -164,7 +164,7 @@ func (s *Server) search(w http.ResponseWriter, r *http.Request) {
 		s.dbError(w, e)
 		return
 	}
-	if s.C.AnthropicKey == "" {
+	if s.C.DeepSeekKey == "" {
 		fail(w, 503, "ia_nao_configurada")
 		return
 	}

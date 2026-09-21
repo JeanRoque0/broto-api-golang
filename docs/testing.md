@@ -32,7 +32,7 @@ Falhas de armazenamento são provocadas em diretórios temporários e por trigge
 |---|---|
 | E-mail chegando à caixa de entrada | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`, um destinatário de teste autorizado e saída de rede para o servidor |
 | Link de confirmação/recuperação abrindo a interface | `SITE_URL` acessível e páginas `/confirmado` e `/nova-senha` adaptadas para chamar a broto-api |
-| IA real | Chave Anthropic, modelos disponíveis na conta, imagens/casos de avaliação e orçamento autorizado |
+| IA real | Chave DeepSeek, modelos disponíveis na conta, imagens/casos de avaliação e orçamento autorizado |
 | Push no celular | App configurado para notificações, aparelho, permissões e token Expo válido; autorização para enviar |
 | Google/Apple | Google implementado e testado com provedor simulado: faltam configuração externa e adaptação do app. Apple ainda precisa de implementação |
 | Compra real | Integração de pagamentos ainda por implementar e ambiente sandbox do provedor |
@@ -97,3 +97,9 @@ Adicionados testes de assinatura CloudFront RSA-2048 (validação criptográfica
 `scripts/deploy/test_deploy.py` verifica preservação de segurança na task definition, descarte de campos de resposta da AWS, detecção de rollback e não rotação/sobrescrita indevida da senha de banco. Terraform tem dois testes mock no repositório de infraestrutura.
 
 Validação local desta entrega: `go test ./...`, `go vet ./...`, integração completa com `-race` e PostgreSQL descartável, quatro testes Python, build scratch e Compose saudável. Não houve envio de SMTP nem uso pago de IA nesses testes. AWS real foi consultada apenas para identidade, disponibilidade do RDS e preços. IAM efetivo, OIDC GitHub, rollout real, CloudFront/S3 real, recuperação de backup e teste de carga prolongado ainda precisam de ambiente provisionado. Não existe garantia de capacidade em usuários simultâneos derivada desses testes.
+
+## Migração para DeepSeek em 21/09/2026
+
+Os testes atuais usam o contrato Chat Completions da DeepSeek, incluindo visão base64, histórico, JSON mode, validação local do schema, respostas truncadas/vazias, falhas HTTP e estimativa de custo com cache. A suíte de integração preserva os cenários do frontend, créditos e rollback; não chama provedores reais. O teste antigo de effort da Anthropic foi substituído. Os relatos Anthropic acima são históricos, não validação da DeepSeek.
+
+A consulta gratuita/autenticada `/models` confirmou a chave e a disponibilidade de `deepseek-flash`. Não foi feita inferência paga nesta migração. `python3 scripts/test-live.py --chat` continua disponível para duas chamadas reais, somente com autorização para gastar tokens. Qualidade botânica, latência real e consumo de tokens precisam de avaliação com imagens e orçamento autorizados.

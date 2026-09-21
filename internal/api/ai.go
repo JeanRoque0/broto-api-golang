@@ -1,7 +1,6 @@
 package api
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -22,19 +21,6 @@ type message struct {
 	Role    string `json:"role"`
 	Content any    `json:"content"`
 }
-type modelReply struct {
-	Content []struct {
-		Type string `json:"type"`
-		Text string `json:"text"`
-	} `json:"content"`
-	Stop  string `json:"stop_reason"`
-	Usage struct {
-		Input  int `json:"input_tokens"`
-		Output int `json:"output_tokens"`
-		Write  int `json:"cache_creation_input_tokens"`
-		Read   int `json:"cache_read_input_tokens"`
-	} `json:"usage"`
-}
 
 func asset(name string) string {
 	b, e := assets.ReadFile("assets/" + name)
@@ -42,60 +28,6 @@ func asset(name string) string {
 		panic(e)
 	}
 	return string(b)
-}
-func (s *Server) ask(ctx context.Context, model, system, schema string, messages []message, max int) (string, int, error) {
-	if model == "" || s.C.AnthropicKey == "" {
-		return "", 0, errors.New("AI configuration missing")
-	}
-	payload := map[string]any{"model": model, "max_tokens": max, "system": system, "messages": messages}
-	outputConfig := map[string]any{}
-	// Haiku 4.5 does not support effort. Apply it to the supported Opus/Sonnet 5
-	// models while preserving the existing schema configuration.
-	if s.C.AnthropicEffort != "" && (strings.HasPrefix(model, "claude-opus-5") || strings.HasPrefix(model, "claude-sonnet-5")) {
-		outputConfig["effort"] = s.C.AnthropicEffort
-	}
-	if schema != "" {
-		outputConfig["format"] = map[string]any{"type": "json_schema", "schema": json.RawMessage(schema)}
-	}
-	if len(outputConfig) > 0 {
-		payload["output_config"] = outputConfig
-	}
-	b, e := json.Marshal(payload)
-	if e != nil {
-		return "", 0, e
-	}
-	req, e := http.NewRequestWithContext(ctx, "POST", "https://api.anthropic.com/v1/messages", bytes.NewReader(b))
-	if e != nil {
-		return "", 0, e
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("x-api-key", s.C.AnthropicKey)
-	req.Header.Set("anthropic-version", "2023-06-01")
-	res, e := s.HTTP.Do(req)
-	if e != nil {
-		return "", 0, e
-	}
-	defer res.Body.Close()
-	if res.StatusCode != 200 {
-		return "", 0, fmt.Errorf("model HTTP status %d", res.StatusCode)
-	}
-	var out modelReply
-	if e = json.NewDecoder(io.LimitReader(res.Body, 2<<20)).Decode(&out); e != nil {
-		return "", 0, e
-	}
-	if out.Stop != "end_turn" {
-		return "", 0, fmt.Errorf("model stopped: %s", out.Stop)
-	}
-	// Preserve the source project's accounting. Unknown model prices stay unpriced.
-	prices := map[string][2]float64{"claude-opus-5": {5, 25}, "claude-sonnet-5": {3, 15}, "claude-haiku-4-5": {1, 5}}
-	price := prices[model]
-	cost := int((float64(out.Usage.Input)+1.25*float64(out.Usage.Write)+.1*float64(out.Usage.Read))*price[0] + float64(out.Usage.Output)*price[1] + .5)
-	for _, c := range out.Content {
-		if c.Type == "text" && strings.TrimSpace(c.Text) != "" {
-			return strings.TrimSpace(c.Text), cost, nil
-		}
-	}
-	return "", 0, errors.New("empty model response")
 }
 func (s *Server) askJSON(ctx context.Context, model, prompt, schema, input string) (map[string]any, int, error) {
 	text, cost, e := s.ask(ctx, model, prompt, schema, []message{{"user", input}}, 1200)
@@ -110,7 +42,7 @@ func (s *Server) askJSON(ctx context.Context, model, prompt, schema, input strin
 	return v, cost, e
 }
 func (s *Server) aiTx(w http.ResponseWriter, r *http.Request) (pgx.Tx, bool) {
-	if s.C.AnthropicKey == "" {
+	if s.C.DeepSeekKey == "" {
 		fail(w, 503, "ia_nao_configurada")
 		return nil, false
 	}
@@ -245,7 +177,7 @@ func (s *Server) identify(w http.ResponseWriter, r *http.Request) {
 		creditError(w, a, false)
 		return
 	}
-	content := []any{map[string]any{"type": "image", "source": map[string]string{"type": "base64", "media_type": mime, "data": base64.StdEncoding.EncodeToString(photo)}}, map[string]string{"type": "text", "text": "Analise esta planta. Escreva a resposta em " + languages[b.Language] + "."}}
+	content := []any{map[string]any{"type": "image_url", "image_url": map[string]string{"url": "data:" + mime + ";base64," + base64.StdEncoding.EncodeToString(photo)}}, map[string]string{"type": "text", "text": "Analise esta planta. Escreva a resposta em " + languages[b.Language] + "."}}
 	text, cost, e := s.ask(ctx, s.C.VisionModel, asset("SYSTEM_PROMPT.txt"), asset("RESULT_SCHEMA.json"), []message{{"user", content}}, 4096)
 	if e != nil {
 		slog.Error("identify failed", "error", e)

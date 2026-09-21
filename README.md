@@ -13,9 +13,9 @@ curl http://localhost:8080/healthz
 
 O `.env` de desenvolvimento confirma e-mails automaticamente. Para publicar, configure SMTP e `DEV_AUTO_CONFIRM=false`, domínios reais em `PUBLIC_URL`, `SITE_URL` e `CORS_ORIGINS`, e HTTPS no proxy. A API fica exposta apenas em `127.0.0.1:8080`; o banco fica na rede interna do Compose.
 
-Configure `ANTHROPIC_API_KEY` e `ANTHROPIC_MODEL` no `.env` para análise real. O modelo de visão deve aceitar imagens e JSON estruturado e estar disponível na sua conta. Chat, fatos e busca usam `claude-haiku-4-5` por padrão. Sem chave a API continua funcionando para login/dados/fotos e retorna 503 nas operações de IA. Nenhuma chave do Supabase é necessária para executar este backend.
+Configure `DEEPSEEK_API_KEY` no `.env`. Visão (`VISION_MODEL`), fatos/confirmações (`TEXT_MODEL`), chat (`CHAT_MODEL`) e busca (`SEARCH_MODEL`) usam `deepseek-flash` por padrão. Sem chave a API continua funcionando para login/dados/fotos e retorna 503 nas operações de IA. Nenhuma chave do Supabase é necessária para executar este backend.
 
-O modelo de chat é configurado separadamente por `CHAT_MODEL`. `ANTHROPIC_EFFORT` controla `output_config.effort` nos modelos Opus 5/Sonnet 5, preservando o schema JSON de análise; não é enviado ao Haiku 4.5. `CHAT_MAX_TOKENS` limita a saída total, incluindo thinking, com padrão 600; o ambiente local foi configurado com Opus 5, esforço medium e limite 2048. Fatos/busca continuam com seus modelos separados.
+A integração usa `https://api.deepseek.com/chat/completions`, imagens base64 no formato `image_url`, modo JSON para respostas estruturadas e validação local contra os schemas embutidos. Thinking fica desabilitado para respostas diretas e menor consumo; `CHAT_MAX_TOKENS` limita a saída. Respostas vazias, truncadas ou fora do schema não confirmam créditos. Não existe fallback para Claude. `cost_micros` é uma estimativa conservadora pelas tarifas de pico do Flash consultadas em 21/09/2026, não a fatura do provedor (fora de pico pode custar menos).
 
 Login Google já está implementado no backend: configure `GOOGLE_AUTH_ENABLED`, credenciais Web e callback conforme [google-auth.md](docs/google-auth.md). O app ainda precisa trocar as chamadas Supabase. Não é necessário outro contêiner nem SMTP para autenticar com Google.
 
@@ -80,7 +80,7 @@ SMTP é exercitado por um servidor TCP local dentro dos testes Go, com STARTTLS,
 
 `SMTP_MIN_INTERVAL_SECONDS=60` limita tentativas de e-mail por usuário, compartilhado entre confirmação e recuperação e persistido no banco. Tentativas bloqueadas retornam 429/`intervalo_email` com `Retry-After`; falha SMTP também ocupa o intervalo para evitar repetição de envios ambíguos. Os testes reais ficam separados em `scripts/test-live.py` e só enviam e-mail/gastam tokens com flags explícitas; não fazem parte da suíte automática.
 
-Documentação dos provedores consultada: [Anthropic Messages](https://platform.claude.com/docs/en/api/messages/create), [serviços Compose](https://docs.docker.com/reference/compose-file/services/), [versões Go](https://go.dev/dl/).
+Documentação dos provedores consultada: [DeepSeek Vision](https://api-docs.deepseek.com/guides/vision/), [JSON mode](https://api-docs.deepseek.com/guides/json_mode/), [preços](https://api-docs.deepseek.com/quick_start/pricing/), [serviços Compose](https://docs.docker.com/reference/compose-file/services/), [versões Go](https://go.dev/dl/).
 
 ## Produção AWS
 

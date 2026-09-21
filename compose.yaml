@@ -35,13 +35,12 @@ services:
       STORAGE_DIR: /data/photos
       STORAGE_QUOTA_BYTES: ${STORAGE_QUOTA_BYTES:-536870912}
       DEV_AUTO_CONFIRM: ${DEV_AUTO_CONFIRM:-false}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-}
-      FACTS_MODEL: ${FACTS_MODEL:-claude-haiku-4-5}
-      CHAT_MODEL: ${CHAT_MODEL:-claude-haiku-4-5}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      VISION_MODEL: ${VISION_MODEL:-deepseek-flash}
+      TEXT_MODEL: ${TEXT_MODEL:-deepseek-flash}
+      CHAT_MODEL: ${CHAT_MODEL:-deepseek-flash}
+      SEARCH_MODEL: ${SEARCH_MODEL:-deepseek-flash}
       CHAT_MAX_TOKENS: ${CHAT_MAX_TOKENS:-600}
-      ANTHROPIC_EFFORT: ${ANTHROPIC_EFFORT:-}
-      SEARCH_MODEL: ${SEARCH_MODEL:-claude-haiku-4-5}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USER: ${SMTP_USER:-}

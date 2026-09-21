@@ -14,10 +14,9 @@ type Config struct {
 	DBMaxConns, MaxRequests                                                   int
 	DisableMigrations                                                         bool
 	TrustedProxyCIDRs                                                         string
-	AnthropicEffort                                                           string
 	ChatMaxTokens, SMTPMinIntervalSeconds                                     int
 	DatabaseURL, Address, StorageDir, SigningKey, PublicURL, SiteURL, Origins string
-	AnthropicKey, VisionModel, FactsModel, ChatModel, SearchModel             string
+	DeepSeekKey, VisionModel, FactsModel, ChatModel, SearchModel              string
 	SMTPHost, SMTPPort, SMTPUser, SMTPPassword, SMTPFrom                      string
 	DevAuth                                                                   bool
 	StorageQuota                                                              int64
@@ -32,7 +31,7 @@ func env(k, d string) string {
 	return d
 }
 func LoadConfig() (Config, error) {
-	c := Config{DatabaseURL: os.Getenv("DATABASE_URL"), Address: env("HTTP_ADDR", ":8080"), StorageDir: env("STORAGE_DIR", "data/photos"), SigningKey: os.Getenv("SIGNING_KEY"), PublicURL: env("PUBLIC_URL", "http://localhost:8080"), SiteURL: env("SITE_URL", "http://localhost:3000"), Origins: env("CORS_ORIGINS", "http://localhost:3000"), AnthropicKey: os.Getenv("ANTHROPIC_API_KEY"), VisionModel: os.Getenv("ANTHROPIC_MODEL"), FactsModel: env("FACTS_MODEL", "claude-haiku-4-5"), ChatModel: env("CHAT_MODEL", "claude-haiku-4-5"), SearchModel: env("SEARCH_MODEL", "claude-haiku-4-5"), SMTPHost: os.Getenv("SMTP_HOST"), SMTPPort: env("SMTP_PORT", "587"), SMTPUser: os.Getenv("SMTP_USER"), SMTPPassword: os.Getenv("SMTP_PASSWORD"), SMTPFrom: os.Getenv("SMTP_FROM"), DevAuth: os.Getenv("DEV_AUTO_CONFIRM") == "true"}
+	c := Config{DatabaseURL: os.Getenv("DATABASE_URL"), Address: env("HTTP_ADDR", ":8080"), StorageDir: env("STORAGE_DIR", "data/photos"), SigningKey: os.Getenv("SIGNING_KEY"), PublicURL: env("PUBLIC_URL", "http://localhost:8080"), SiteURL: env("SITE_URL", "http://localhost:3000"), Origins: env("CORS_ORIGINS", "http://localhost:3000"), DeepSeekKey: os.Getenv("DEEPSEEK_API_KEY"), VisionModel: env("VISION_MODEL", "deepseek-flash"), FactsModel: env("TEXT_MODEL", "deepseek-flash"), ChatModel: env("CHAT_MODEL", "deepseek-flash"), SearchModel: env("SEARCH_MODEL", "deepseek-flash"), SMTPHost: os.Getenv("SMTP_HOST"), SMTPPort: env("SMTP_PORT", "587"), SMTPUser: os.Getenv("SMTP_USER"), SMTPPassword: os.Getenv("SMTP_PASSWORD"), SMTPFrom: os.Getenv("SMTP_FROM"), DevAuth: os.Getenv("DEV_AUTO_CONFIRM") == "true"}
 	c.StorageQuota = 512 << 20
 	var dbError error
 	c.DatabaseURL, dbError = databaseURL()
@@ -62,10 +61,6 @@ func LoadConfig() (Config, error) {
 	}
 	if c.StorageBucket != "" && c.AWSRegion == "" {
 		return c, errors.New("AWS_REGION is required for S3 storage")
-	}
-	c.AnthropicEffort = os.Getenv("ANTHROPIC_EFFORT")
-	if c.AnthropicEffort != "" && !contains("low medium high xhigh max", c.AnthropicEffort) {
-		return c, errors.New("invalid ANTHROPIC_EFFORT")
 	}
 	var configError error
 	c.SMTPMinIntervalSeconds, configError = strconv.Atoi(env("SMTP_MIN_INTERVAL_SECONDS", "60"))

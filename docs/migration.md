@@ -25,7 +25,7 @@ Não basta mudar `SUPABASE_URL`: o SDK usa contratos próprios para autenticaç�
 
 1. Configure `.env` com `python3 scripts/setup_env.py` e execute o Compose.
 2. Teste cadastro/login, plantas/tarefas, fotos e edição no novo app.
-3. Configure a chave Anthropic e um modelo de visão autorizado. Teste uma foto legível, uma ilegível, chat Pro e busca.
+3. Configure a chave DeepSeek e um modelo de visão autorizado. Teste uma foto legível, uma ilegível, chat Pro e busca.
 4. Configure SMTP, desative `DEV_AUTO_CONFIRM` e adapte `/confirmado` e `/nova-senha` no site.
 5. Configure o domínio HTTPS e os endereços de API/site/CORS. Em dispositivo físico, `localhost` representa o celular; use um endpoint alcançável e ajuste o bind do Compose/proxy para o ambiente escolhido.
 

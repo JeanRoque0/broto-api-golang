@@ -2,9 +2,7 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -63,46 +61,5 @@ func TestAuthEmailMinimumInterval(t *testing.T) {
 	var tokens int
 	if e := f.s.DB.QueryRow(context.Background(), "select count(*) from auth_tokens").Scan(&tokens); e != nil || tokens != 3 {
 		t.Fatal("throttled sends generated tokens", tokens, e)
-	}
-}
-
-func TestAnthropicEffortPreservesStructuredOutput(t *testing.T) {
-	for _, tc := range []struct {
-		model, effort, schema string
-		wantEffort            bool
-	}{
-		{"claude-opus-5", "medium", `{"type":"object","properties":{}}`, true},
-		{"claude-opus-5", "medium", "", true},
-		{"claude-sonnet-5", "low", "", true},
-		{"claude-haiku-4-5", "medium", `{"type":"object","properties":{}}`, false},
-		{"claude-opus-5", "", "", false},
-	} {
-		t.Run(tc.model+tc.effort+tc.schema, func(t *testing.T) {
-			s := &Server{C: Config{AnthropicKey: "test-only", AnthropicEffort: tc.effort}}
-			s.HTTP = &http.Client{Transport: transportFunc(func(r *http.Request) (*http.Response, error) {
-				var payload map[string]any
-				if e := json.NewDecoder(r.Body).Decode(&payload); e != nil {
-					t.Fatal(e)
-				}
-				output, _ := payload["output_config"].(map[string]any)
-				if (output["effort"] != nil) != tc.wantEffort {
-					t.Fatal("wrong effort application")
-				}
-				if tc.wantEffort && output["effort"] != tc.effort {
-					t.Fatal("effort not preserved")
-				}
-				if (output["format"] != nil) != (tc.schema != "") {
-					t.Fatal("structured output overwritten")
-				}
-				if payload["max_tokens"] != float64(2048) || payload["model"] != tc.model || r.Header.Get("anthropic-version") != "2023-06-01" {
-					t.Fatal("Anthropic request contract changed")
-				}
-				return googleReply(200, map[string]any{"stop_reason": "end_turn", "content": []any{map[string]string{"type": "thinking", "thinking": ""}, map[string]string{"type": "text", "text": "Resposta de teste"}}}), nil
-			})}
-			reply, _, e := s.ask(context.Background(), tc.model, "Test", tc.schema, []message{{Role: "user", Content: "test"}}, 2048)
-			if e != nil || reply != "Resposta de teste" {
-				t.Fatal("thinking block interfered with visible answer", e)
-			}
-		})
 	}
 }

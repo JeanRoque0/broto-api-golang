@@ -32,10 +32,10 @@ func TestFrontendAnalysisToPlantAndChat(t *testing.T) {
 		switch payload.Model {
 		case "vision-test":
 			vision++
-			if len(payload.Messages) != 1 {
+			if len(payload.Messages) != 2 {
 				return nil, errors.New("vision request must contain one user message")
 			}
-			parts, ok := payload.Messages[0].Content.([]any)
+			parts, ok := payload.Messages[1].Content.([]any)
 			if !ok || len(parts) != 2 {
 				return nil, errors.New("vision requires one image and text")
 			}
@@ -49,7 +49,7 @@ func TestFrontendAnalysisToPlantAndChat(t *testing.T) {
 			if chat == 2 {
 				want = 3
 			}
-			if len(payload.Messages) != want {
+			if len(payload.Messages) != want+1 {
 				return nil, errors.New("chat history window lost user or assistant message")
 			}
 			return mockReply("Cuide da rega observando a terra."), nil

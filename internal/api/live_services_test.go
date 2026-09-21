@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// These opt-in checks deliver mail and spend Anthropic tokens. The regular
+// These opt-in checks deliver mail and spend DeepSeek tokens. The regular
 // suite never enables them; scripts/test-live.py requires explicit flags.
 func TestLiveSMTP(t *testing.T) {
 	to := os.Getenv("BROTO_LIVE_SMTP_TO")
@@ -31,26 +31,25 @@ func TestLiveSMTP(t *testing.T) {
 	t.Log("SMTP accepted one test message; inbox delivery must be checked by recipient")
 }
 
-func TestLiveAnthropicChat(t *testing.T) {
+func TestLiveDeepSeekChat(t *testing.T) {
 	if os.Getenv("BROTO_LIVE_CHAT") != "true" {
-		t.Skip("explicit live Anthropic flag required")
+		t.Skip("explicit live DeepSeek flag required")
 	}
 	t.Setenv("DATABASE_URL", os.Getenv("TEST_DATABASE_URL"))
 	c, e := LoadConfig()
 	if e != nil {
 		t.Fatal(e)
 	}
-	if c.AnthropicKey == "" {
-		t.Fatal("ANTHROPIC_API_KEY missing")
+	if c.DeepSeekKey == "" {
+		t.Fatal("DEEPSEEK_API_KEY missing")
 	}
 	f := newFrontendHarness(t)
-	f.s.C.AnthropicKey = c.AnthropicKey
+	f.s.C.DeepSeekKey = c.DeepSeekKey
 	f.s.C.ChatModel = c.ChatModel
-	f.s.C.AnthropicEffort = c.AnthropicEffort
 	f.s.C.ChatMaxTokens = c.ChatMaxTokens
-	// Real requests are restricted to Anthropic; fake user data stays disposable.
+	// Real requests are restricted to DeepSeek; fake user data stays disposable.
 	f.s.HTTP = &http.Client{Timeout: 90 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }, Transport: transportFunc(func(r *http.Request) (*http.Response, error) {
-		if r.URL.Scheme != "https" || r.URL.Host != "api.anthropic.com" || r.URL.Path != "/v1/messages" {
+		if r.URL.Scheme != "https" || r.URL.Host != "api.deepseek.com" || r.URL.Path != "/chat/completions" {
 			t.Error("unexpected external target")
 			return nil, context.Canceled
 		}
@@ -76,5 +75,5 @@ func TestLiveAnthropicChat(t *testing.T) {
 	if e := f.s.DB.QueryRow(context.Background(), "select chat_today from profiles where id=$1", id).Scan(&used); e != nil || used != 2 {
 		t.Fatal("chat credit usage incorrect", used, e)
 	}
-	t.Logf("Two real chat turns passed: model=%s effort=%s, 4 messages persisted", c.ChatModel, c.AnthropicEffort)
+	t.Logf("Two real chat turns passed: model=%s, 4 messages persisted", c.ChatModel)
 }
