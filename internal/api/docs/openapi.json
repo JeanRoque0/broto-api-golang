@@ -1,0 +1,6331 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Broto API",
+    "version": "1.0.0",
+    "description": "Contrato HTTP do backend Go. Sessões opacas via Bearer, não JWT Supabase. Try it out executa operações reais, incluindo exclusões e IA. Integrações dependem da configuração do servidor. Veja docs/api.md e docs/google-auth.md."
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Mesmo servidor da documentação"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Saúde"
+    },
+    {
+      "name": "Autenticação"
+    },
+    {
+      "name": "Google OAuth"
+    },
+    {
+      "name": "Conta"
+    },
+    {
+      "name": "Espécies"
+    },
+    {
+      "name": "Lembretes"
+    },
+    {
+      "name": "Fotos"
+    },
+    {
+      "name": "IA"
+    },
+    {
+      "name": "Dados"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/livez": {
+      "get": {
+        "operationId": "get_livez",
+        "summary": "Liveness",
+        "tags": [
+          "Saúde"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": []
+      }
+    },
+    "/readyz": {
+      "get": {
+        "operationId": "get_readyz",
+        "summary": "Readiness (PostgreSQL)",
+        "tags": [
+          "Saúde"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": []
+      }
+    },
+    "/healthz": {
+      "get": {
+        "operationId": "get_healthz",
+        "summary": "Readiness (PostgreSQL)",
+        "tags": [
+          "Saúde"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/auth/signup": {
+      "post": {
+        "operationId": "post_v1_auth_signup",
+        "summary": "Cadastrar conta",
+        "tags": [
+          "Autenticação"
+        ],
+        "description": "Tokens de e-mail expiram em 1 hora. Envios compartilham intervalo por usuário; 429 inclui Retry-After. Senha nova: mínimo 8 unidades UTF-16, uma maiúscula, um caractere especial e máximo 72 bytes. Login aceita credenciais legadas.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          },
+          "202": {
+            "description": "Confirmação de e-mail necessária",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "confirmation_required": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "operationId": "post_v1_auth_login",
+        "summary": "Entrar com e-mail e senha",
+        "tags": [
+          "Autenticação"
+        ],
+        "description": "Tokens de e-mail expiram em 1 hora. Envios compartilham intervalo por usuário; 429 inclui Retry-After. Senha nova: mínimo 8 unidades UTF-16, uma maiúscula, um caractere especial e máximo 72 bytes. Login aceita credenciais legadas.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/recover": {
+      "post": {
+        "operationId": "post_v1_auth_recover",
+        "summary": "Solicitar recuperação de senha",
+        "tags": [
+          "Autenticação"
+        ],
+        "description": "Tokens de e-mail expiram em 1 hora. Envios compartilham intervalo por usuário; 429 inclui Retry-After. Senha nova: mínimo 8 unidades UTF-16, uma maiúscula, um caractere especial e máximo 72 bytes. Login aceita credenciais legadas.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/resend": {
+      "post": {
+        "operationId": "post_v1_auth_resend",
+        "summary": "Reenviar confirmação",
+        "tags": [
+          "Autenticação"
+        ],
+        "description": "Tokens de e-mail expiram em 1 hora. Envios compartilham intervalo por usuário; 429 inclui Retry-After. Senha nova: mínimo 8 unidades UTF-16, uma maiúscula, um caractere especial e máximo 72 bytes. Login aceita credenciais legadas.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/verify": {
+      "post": {
+        "operationId": "post_v1_auth_verify",
+        "summary": "Consumir token de e-mail",
+        "tags": [
+          "Autenticação"
+        ],
+        "description": "Tokens de e-mail expiram em 1 hora. Envios compartilham intervalo por usuário; 429 inclui Retry-After. Senha nova: mínimo 8 unidades UTF-16, uma maiúscula, um caractere especial e máximo 72 bytes. Login aceita credenciais legadas.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token_hash": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "email",
+                      "recovery"
+                    ]
+                  }
+                },
+                "required": [
+                  "token_hash",
+                  "type"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "operationId": "post_v1_auth_logout",
+        "summary": "Encerrar sessão",
+        "tags": [
+          "Autenticação"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "operationId": "post_v1_auth_refresh",
+        "summary": "Rotacionar sessão",
+        "tags": [
+          "Autenticação"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/user": {
+      "get": {
+        "operationId": "get_v1_auth_user",
+        "summary": "Ler usuário da sessão",
+        "tags": [
+          "Autenticação"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/password": {
+      "patch": {
+        "operationId": "patch_v1_auth_password",
+        "summary": "Alterar senha e invalidar sessões anteriores",
+        "tags": [
+          "Autenticação"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  }
+                },
+                "required": [
+                  "password"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/google/start": {
+      "post": {
+        "operationId": "post_v1_auth_google_start",
+        "summary": "Iniciar Google OAuth com PKCE",
+        "tags": [
+          "Google OAuth"
+        ],
+        "description": "PKCE S256. Abra a URL retornada no navegador para receber o cookie. Retorno deve estar em GOOGLE_RETURN_URLS. Ver docs/google-auth.md; 503 quando desativado.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "type": "string"
+                    },
+                    "expires_in": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code_challenge": {
+                    "type": "string",
+                    "minLength": 43,
+                    "maxLength": 43
+                  },
+                  "redirect_uri": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code_challenge",
+                  "redirect_uri"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/google/authorize": {
+      "get": {
+        "operationId": "get_v1_auth_google_authorize",
+        "summary": "Redirecionamento OAuth: authorize",
+        "tags": [
+          "Google OAuth"
+        ],
+        "description": "Fluxo de navegação com cookie HttpOnly e estado de uso único. Abra no navegador; não use Try it out para completar login Google.",
+        "responses": {
+          "default": {
+            "$ref": "#/components/responses/Error"
+          },
+          "302": {
+            "description": "Redirecionamento ao Google ou ao retorno permitido do app",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "URL de destino"
+              }
+            }
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": ""
+          }
+        ]
+      }
+    },
+    "/v1/auth/google/callback": {
+      "get": {
+        "operationId": "get_v1_auth_google_callback",
+        "summary": "Redirecionamento OAuth: callback",
+        "tags": [
+          "Google OAuth"
+        ],
+        "description": "Fluxo de navegação com cookie HttpOnly e estado de uso único. Abra no navegador; não use Try it out para completar login Google.",
+        "responses": {
+          "default": {
+            "$ref": "#/components/responses/Error"
+          },
+          "302": {
+            "description": "Redirecionamento ao Google ou ao retorno permitido do app",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "URL de destino"
+              }
+            }
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": ""
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": ""
+          },
+          {
+            "name": "error",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": ""
+          }
+        ]
+      }
+    },
+    "/v1/auth/google/exchange": {
+      "post": {
+        "operationId": "post_v1_auth_google_exchange",
+        "summary": "Trocar código temporário por sessão Broto",
+        "tags": [
+          "Google OAuth"
+        ],
+        "description": "Código de uso único expira em 60 segundos; verifier original do app.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "code_verifier": {
+                    "type": "string",
+                    "minLength": 43,
+                    "maxLength": 128
+                  }
+                },
+                "required": [
+                  "code",
+                  "code_verifier"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/account": {
+      "delete": {
+        "operationId": "delete_v1_account",
+        "summary": "Excluir conta e seus dados",
+        "tags": [
+          "Conta"
+        ],
+        "description": "Operação destrutiva. Fotos são removidas por fila persistente; 202 indica limpeza pendente.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          },
+          "202": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "photos_cleanup_pending": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/functions/v1/delete-account": {
+      "post": {
+        "operationId": "post_functions_v1_delete_account",
+        "summary": "Excluir conta e seus dados",
+        "tags": [
+          "Conta"
+        ],
+        "description": "Operação destrutiva. Fotos são removidas por fila persistente; 202 indica limpeza pendente.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          },
+          "202": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "photos_cleanup_pending": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/species-facts": {
+      "get": {
+        "operationId": "get_v1_species_facts",
+        "summary": "Consultar ficha de espécie em cache",
+        "tags": [
+          "Espécies"
+        ],
+        "description": "Retorna a ficha diretamente ou null; não inicia uma análise paga.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "cuidados": {
+                      "type": "object",
+                      "properties": {
+                        "rega_dias": {
+                          "type": "integer",
+                          "description": "intervalo entre regas, de 1 a 60 dias"
+                        },
+                        "luz": {
+                          "type": "string",
+                          "enum": [
+                            "sol_direto",
+                            "sol_parcial",
+                            "luz_indireta",
+                            "meia_sombra",
+                            "sombra"
+                          ]
+                        },
+                        "luz_nota": {
+                          "type": "string",
+                          "description": "uma frase completa com ponto final, ou vazio"
+                        },
+                        "adubo": {
+                          "type": "string",
+                          "enum": [
+                            "quinzenal",
+                            "mensal",
+                            "bimestral",
+                            "estacional",
+                            "nao_precisa"
+                          ]
+                        },
+                        "adubo_nota": {
+                          "type": "string",
+                          "description": "uma frase completa com ponto final, ou vazio"
+                        },
+                        "vaporizar_dias": {
+                          "type": "integer",
+                          "description": "intervalo entre vaporizações, de 1 a 15 dias; null quando a espécie não precisa",
+                          "nullable": true
+                        },
+                        "girar_dias": {
+                          "type": "integer",
+                          "description": "intervalo para girar o vaso, de 7 a 60 dias"
+                        },
+                        "replantar_meses": {
+                          "type": "integer",
+                          "description": "intervalo para trocar de vaso, de 6 a 48 meses"
+                        },
+                        "podar_mes": {
+                          "type": "integer",
+                          "description": "mês do ano em que a poda deve ser feita, de 1 a 12; null quando a espécie não é podada",
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "rega_dias",
+                        "luz",
+                        "luz_nota",
+                        "adubo",
+                        "adubo_nota",
+                        "vaporizar_dias",
+                        "girar_dias",
+                        "replantar_meses",
+                        "podar_mes"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "toxica_para_pets": {
+                      "type": "boolean"
+                    },
+                    "temperatura": {
+                      "type": "object",
+                      "properties": {
+                        "min_c": {
+                          "type": "integer",
+                          "description": "menor temperatura confortável, em Celsius"
+                        },
+                        "max_c": {
+                          "type": "integer",
+                          "description": "maior temperatura confortável, em Celsius"
+                        },
+                        "nota": {
+                          "type": "string",
+                          "description": "uma frase completa com ponto final"
+                        }
+                      },
+                      "required": [
+                        "min_c",
+                        "max_c",
+                        "nota"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "cultivo": {
+                      "type": "string",
+                      "description": "duas a quatro frases sobre como multiplicar e manter"
+                    },
+                    "simbolismo": {
+                      "type": "string",
+                      "description": "atribuição cultural declarada como atribuição, ou string vazia"
+                    }
+                  },
+                  "required": [
+                    "cuidados",
+                    "toxica_para_pets",
+                    "temperatura",
+                    "cultivo",
+                    "simbolismo"
+                  ],
+                  "additionalProperties": false,
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "scientific",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "description": ""
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pt-BR",
+                "en-US",
+                "es-ES"
+              ]
+            },
+            "description": ""
+          }
+        ]
+      }
+    },
+    "/v1/reminders/unread-count": {
+      "get": {
+        "operationId": "get_v1_reminders_unread_count",
+        "summary": "Contar lembretes não lidos",
+        "tags": [
+          "Lembretes"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/reminders/read": {
+      "post": {
+        "operationId": "post_v1_reminders_read",
+        "summary": "Marcar todos os lembretes como lidos",
+        "tags": [
+          "Lembretes"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "updated": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/photos": {
+      "post": {
+        "operationId": "post_v1_photos",
+        "summary": "Enviar foto binária",
+        "tags": [
+          "Fotos"
+        ],
+        "description": "JPEG, PNG ou WebP, máximo 8 MiB. Envie bytes diretamente, não multipart/form-data. Consome quota de armazenamento.",
+        "responses": {
+          "201": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "image/jpeg": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            },
+            "image/png": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            },
+            "image/webp": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete_v1_photos",
+        "summary": "Excluir foto sem referências",
+        "tags": [
+          "Fotos"
+        ],
+        "description": "409 enquanto a foto estiver vinculada a um registro.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/photos/sign": {
+      "post": {
+        "operationId": "post_v1_photos_sign",
+        "summary": "Criar URL temporária para foto própria",
+        "tags": [
+          "Fotos"
+        ],
+        "description": "CloudFront: 300 segundos. Armazenamento local: 3600 segundos. Grave apenas path, nunca a URL assinada.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "signedUrl": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "expiresIn": {
+                      "type": "integer",
+                      "enum": [
+                        300,
+                        3600
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/photos/object": {
+      "get": {
+        "operationId": "get_v1_photos_object",
+        "summary": "Ler foto com assinatura local",
+        "tags": [
+          "Fotos"
+        ],
+        "description": "Use a URL completa retornada por /v1/photos/sign. CloudFront serve fotos em sua própria URL.",
+        "responses": {
+          "200": {
+            "description": "Imagem",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": ""
+          },
+          {
+            "name": "expires",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": ""
+          },
+          {
+            "name": "signature",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": ""
+          }
+        ]
+      }
+    },
+    "/v1/identify": {
+      "post": {
+        "operationId": "post_v1_identify",
+        "summary": "Analisar planta",
+        "tags": [
+          "IA"
+        ],
+        "description": "Exatamente uma foto própria. Foto ilegível retorna HTTP 200 com erro=foto_ilegivel, sem consumo. Falhas de IA não consomem créditos. Idioma ausente/desconhecido usa pt-BR.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Analysis"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "photoPaths": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "maxItems": 1
+                  },
+                  "plantId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "language": {
+                    "type": "string",
+                    "enum": [
+                      "pt-BR",
+                      "en-US",
+                      "es-ES"
+                    ],
+                    "default": "pt-BR"
+                  }
+                },
+                "required": [
+                  "photoPaths"
+                ]
+              },
+              "example": {
+                "photoPaths": [
+                  "<user-id>/<photo>.jpg"
+                ],
+                "plantId": null,
+                "language": "pt-BR"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/functions/v1/identify": {
+      "post": {
+        "operationId": "post_functions_v1_identify",
+        "summary": "Analisar planta",
+        "tags": [
+          "IA"
+        ],
+        "description": "Exatamente uma foto própria. Foto ilegível retorna HTTP 200 com erro=foto_ilegivel, sem consumo. Falhas de IA não consomem créditos. Idioma ausente/desconhecido usa pt-BR. Alias de compatibilidade.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Analysis"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "photoPaths": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "maxItems": 1
+                  },
+                  "plantId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "language": {
+                    "type": "string",
+                    "enum": [
+                      "pt-BR",
+                      "en-US",
+                      "es-ES"
+                    ],
+                    "default": "pt-BR"
+                  }
+                },
+                "required": [
+                  "photoPaths"
+                ]
+              },
+              "example": {
+                "photoPaths": [
+                  "<user-id>/<photo>.jpg"
+                ],
+                "plantId": null,
+                "language": "pt-BR"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/chat": {
+      "post": {
+        "operationId": "post_v1_chat",
+        "summary": "Conversar sobre plantas",
+        "tags": [
+          "IA"
+        ],
+        "description": "Exige plano Pro válido ou assinatura de chat. Reutilize threadId. Pode consumir limite contratado.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "threadId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "reply": {
+                      "type": "string"
+                    },
+                    "restantes": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "maxLength": 800
+                  },
+                  "threadId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "plantId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "message"
+                ]
+              },
+              "example": {
+                "message": "Quando regar?",
+                "threadId": null,
+                "plantId": null
+              }
+            }
+          }
+        }
+      }
+    },
+    "/functions/v1/chat": {
+      "post": {
+        "operationId": "post_functions_v1_chat",
+        "summary": "Conversar sobre plantas",
+        "tags": [
+          "IA"
+        ],
+        "description": "Exige plano Pro válido ou assinatura de chat. Reutilize threadId. Pode consumir limite contratado. Alias de compatibilidade.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "threadId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "reply": {
+                      "type": "string"
+                    },
+                    "restantes": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "maxLength": 800
+                  },
+                  "threadId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "plantId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "message"
+                ]
+              },
+              "example": {
+                "message": "Quando regar?",
+                "threadId": null,
+                "plantId": null
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/search": {
+      "post": {
+        "operationId": "post_v1_search",
+        "summary": "Buscar espécies",
+        "tags": [
+          "IA"
+        ],
+        "description": "Termo menor que 3 caracteres retorna lista vazia sem campo fonte; imagens vêm da Wikimedia.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultados": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "scientific": {
+                            "type": "string"
+                          },
+                          "common": {
+                            "type": "string"
+                          },
+                          "extract": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "images": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "fonte": {
+                      "type": "string",
+                      "enum": [
+                        "cache",
+                        "modelo",
+                        "vazio"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "term": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "term"
+                ]
+              },
+              "example": {
+                "term": "jiboia"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/functions/v1/search": {
+      "post": {
+        "operationId": "post_functions_v1_search",
+        "summary": "Buscar espécies",
+        "tags": [
+          "IA"
+        ],
+        "description": "Termo menor que 3 caracteres retorna lista vazia sem campo fonte; imagens vêm da Wikimedia. Alias de compatibilidade.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultados": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "scientific": {
+                            "type": "string"
+                          },
+                          "common": {
+                            "type": "string"
+                          },
+                          "extract": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "images": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "fonte": {
+                      "type": "string",
+                      "enum": [
+                        "cache",
+                        "modelo",
+                        "vazio"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "term": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "term"
+                ]
+              },
+              "example": {
+                "term": "jiboia"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/data/profiles": {
+      "get": {
+        "operationId": "get_v1_data_profiles",
+        "summary": "Ler profiles",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Ordenação por created_at e id. Perfil retorna objeto; demais coleções retornam lista.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/profilesRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            },
+            "description": ""
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": ""
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": ""
+          },
+          {
+            "name": "accepted_terms_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "accepted_tips",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "accepted_tips_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "avatar_path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "dismissed_announcement",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "display_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "last_seen_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "notifications_enabled",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "reminder_time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "revoked_terms_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "temperature_unit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "terms_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "patch_v1_data_profiles",
+        "summary": "PATCH profiles",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: display_name avatar_path timezone reminder_time notifications_enabled accepted_terms_at terms_version accepted_tips accepted_tips_at temperature_unit dismissed_announcement revoked_terms_at language last_seen_at. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/profilesRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/profilesWrite"
+              },
+              "example": {
+                "display_name": "Jardineiro"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/data/profiles/{id}": {
+      "get": {
+        "operationId": "get_v1_data_profiles_id",
+        "summary": "Ler profiles pela chave",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. ",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/profilesRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id. Para profiles, somente ID da sessão."
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "patch_v1_data_profilesById",
+        "summary": "PATCH profiles",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: display_name avatar_path timezone reminder_time notifications_enabled accepted_terms_at terms_version accepted_tips accepted_tips_at temperature_unit dismissed_announcement revoked_terms_at language last_seen_at. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/profilesRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/profilesWrite"
+              },
+              "example": {
+                "display_name": "Jardineiro"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID da sessão."
+          }
+        ]
+      }
+    },
+    "/v1/data/plants": {
+      "get": {
+        "operationId": "get_v1_data_plants",
+        "summary": "Ler plants",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Ordenação por created_at e id. Perfil retorna objeto; demais coleções retornam lista.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/plantsRecord"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            },
+            "description": ""
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": ""
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": ""
+          },
+          {
+            "name": "archived_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "care_notes",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "fertilizer",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "fertilizer_note",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "group_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "last_watered_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "light",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "light_note",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "mist_days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "nickname",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "notify_watering",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "photo_path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "prune_month",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "repot_months",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "room",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "rotate_days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "species_common",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "species_scientific",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "temp_max_c",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "temp_min_c",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "toxic_to_pets",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "watering_interval_days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          }
+        ]
+      },
+      "post": {
+        "operationId": "post_v1_data_plants",
+        "summary": "POST plants",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: nickname species_scientific species_common photo_path room watering_interval_days light care_notes last_watered_at notify_watering archived_at group_id fertilizer light_note fertilizer_note toxic_to_pets mist_days rotate_days repot_months prune_month temp_min_c temp_max_c. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "201": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/plantsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nickname": {
+                    "type": "string"
+                  },
+                  "species_scientific": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "species_common": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "photo_path": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "room": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "watering_interval_days": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "light": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "care_notes": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "last_watered_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true
+                  },
+                  "notify_watering": {
+                    "type": "boolean"
+                  },
+                  "archived_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true
+                  },
+                  "group_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "fertilizer": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "light_note": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "fertilizer_note": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "toxic_to_pets": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "mist_days": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "rotate_days": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "repot_months": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "prune_month": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "temp_min_c": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "temp_max_c": {
+                    "type": "integer",
+                    "nullable": true
+                  }
+                },
+                "additionalProperties": false,
+                "minProperties": 1,
+                "required": [
+                  "nickname"
+                ]
+              },
+              "example": {
+                "nickname": "Minha jiboia"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/data/plants/{id}": {
+      "get": {
+        "operationId": "get_v1_data_plants_id",
+        "summary": "Ler plants pela chave",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. ",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/plantsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id. Para profiles, somente ID da sessão."
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "patch_v1_data_plants_id",
+        "summary": "PATCH plants",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: nickname species_scientific species_common photo_path room watering_interval_days light care_notes last_watered_at notify_watering archived_at group_id fertilizer light_note fertilizer_note toxic_to_pets mist_days rotate_days repot_months prune_month temp_min_c temp_max_c. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/plantsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id; escape como segmento de URL."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/plantsWrite"
+              },
+              "example": {
+                "nickname": "Minha jiboia"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete_v1_data_plants_id",
+        "summary": "DELETE plants",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: nickname species_scientific species_common photo_path room watering_interval_days light care_notes last_watered_at notify_watering archived_at group_id fertilizer light_note fertilizer_note toxic_to_pets mist_days rotate_days repot_months prune_month temp_min_c temp_max_c. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id; escape como segmento de URL."
+          }
+        ]
+      }
+    },
+    "/v1/data/plant_groups": {
+      "get": {
+        "operationId": "get_v1_data_plant_groups",
+        "summary": "Ler plant_groups",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Ordenação por created_at e id. Perfil retorna objeto; demais coleções retornam lista.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/plant_groupsRecord"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            },
+            "description": ""
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": ""
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": ""
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          }
+        ]
+      },
+      "post": {
+        "operationId": "post_v1_data_plant_groups",
+        "summary": "POST plant_groups",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: name. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "201": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/plant_groupsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "minProperties": 1,
+                "required": [
+                  "name"
+                ]
+              },
+              "example": {
+                "name": "Sala"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/data/plant_groups/{id}": {
+      "get": {
+        "operationId": "get_v1_data_plant_groups_id",
+        "summary": "Ler plant_groups pela chave",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. ",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/plant_groupsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id. Para profiles, somente ID da sessão."
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "patch_v1_data_plant_groups_id",
+        "summary": "PATCH plant_groups",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: name. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/plant_groupsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id; escape como segmento de URL."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/plant_groupsWrite"
+              },
+              "example": {
+                "name": "Sala"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete_v1_data_plant_groups_id",
+        "summary": "DELETE plant_groups",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: name. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id; escape como segmento de URL."
+          }
+        ]
+      }
+    },
+    "/v1/data/plant_tasks": {
+      "get": {
+        "operationId": "get_v1_data_plant_tasks",
+        "summary": "Ler plant_tasks",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Ordenação por next_at e id. Perfil retorna objeto; demais coleções retornam lista.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/plant_tasksRecord"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            },
+            "description": ""
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": ""
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": ""
+          },
+          {
+            "name": "enabled",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "interval_days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "next_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "plant_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "remind_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            },
+            "description": "Exclui plantas arquivadas."
+          }
+        ]
+      },
+      "post": {
+        "operationId": "post_v1_data_plant_tasks",
+        "summary": "POST plant_tasks",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: plant_id kind interval_days next_at enabled remind_at. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "201": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/plant_tasksRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "plant_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "kind": {
+                    "type": "string"
+                  },
+                  "interval_days": {
+                    "type": "integer"
+                  },
+                  "next_at": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "remind_at": {
+                    "type": "string",
+                    "example": "09:00:00",
+                    "nullable": true
+                  }
+                },
+                "additionalProperties": false,
+                "minProperties": 1,
+                "required": [
+                  "plant_id",
+                  "kind",
+                  "interval_days",
+                  "next_at"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/data/plant_tasks/{id}": {
+      "get": {
+        "operationId": "get_v1_data_plant_tasks_id",
+        "summary": "Ler plant_tasks pela chave",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. ",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/plant_tasksRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id. Para profiles, somente ID da sessão."
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "patch_v1_data_plant_tasks_id",
+        "summary": "PATCH plant_tasks",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: plant_id kind interval_days next_at enabled remind_at. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/plant_tasksRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id; escape como segmento de URL."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/plant_tasksWrite"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete_v1_data_plant_tasks_id",
+        "summary": "DELETE plant_tasks",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: plant_id kind interval_days next_at enabled remind_at. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id; escape como segmento de URL."
+          }
+        ]
+      }
+    },
+    "/v1/data/care_events": {
+      "get": {
+        "operationId": "get_v1_data_care_events",
+        "summary": "Ler care_events",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Ordenação por happened_at e id. Perfil retorna objeto; demais coleções retornam lista.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/care_eventsRecord"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            },
+            "description": ""
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": ""
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": ""
+          },
+          {
+            "name": "happened_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "note",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "plant_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          }
+        ]
+      },
+      "post": {
+        "operationId": "post_v1_data_care_events",
+        "summary": "POST care_events",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: plant_id kind note happened_at. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "201": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/care_eventsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "plant_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "kind": {
+                    "type": "string"
+                  },
+                  "note": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "happened_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "additionalProperties": false,
+                "minProperties": 1,
+                "required": [
+                  "plant_id",
+                  "kind"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/data/care_events/{id}": {
+      "get": {
+        "operationId": "get_v1_data_care_events_id",
+        "summary": "Ler care_events pela chave",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. ",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/care_eventsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id. Para profiles, somente ID da sessão."
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "patch_v1_data_care_events_id",
+        "summary": "PATCH care_events",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: plant_id kind note happened_at. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/care_eventsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id; escape como segmento de URL."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/care_eventsWrite"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete_v1_data_care_events_id",
+        "summary": "DELETE care_events",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: plant_id kind note happened_at. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id; escape como segmento de URL."
+          }
+        ]
+      }
+    },
+    "/v1/data/identifications": {
+      "get": {
+        "operationId": "get_v1_data_identifications",
+        "summary": "Ler identifications",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Ordenação por created_at e id. Perfil retorna objeto; demais coleções retornam lista.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/identificationsRecord"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            },
+            "description": ""
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": ""
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": ""
+          },
+          {
+            "name": "corrected_species",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "plant_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "resolved_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "was_helpful",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          }
+        ]
+      }
+    },
+    "/v1/data/identifications/{id}": {
+      "get": {
+        "operationId": "get_v1_data_identifications_id",
+        "summary": "Ler identifications pela chave",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. ",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/identificationsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id. Para profiles, somente ID da sessão."
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "patch_v1_data_identifications_id",
+        "summary": "PATCH identifications",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: plant_id corrected_species was_helpful resolved_at. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/identificationsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id; escape como segmento de URL."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/identificationsWrite"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete_v1_data_identifications_id",
+        "summary": "DELETE identifications",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: plant_id corrected_species was_helpful resolved_at. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id; escape como segmento de URL."
+          }
+        ]
+      }
+    },
+    "/v1/data/chat_threads": {
+      "get": {
+        "operationId": "get_v1_data_chat_threads",
+        "summary": "Ler chat_threads",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Ordenação por last_message_at e id. Perfil retorna objeto; demais coleções retornam lista.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/chat_threadsRecord"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            },
+            "description": ""
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": ""
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": ""
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "plant_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          }
+        ]
+      }
+    },
+    "/v1/data/chat_threads/{id}": {
+      "get": {
+        "operationId": "get_v1_data_chat_threads_id",
+        "summary": "Ler chat_threads pela chave",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. ",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/chat_threadsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id. Para profiles, somente ID da sessão."
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "delete_v1_data_chat_threads_id",
+        "summary": "DELETE chat_threads",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: nenhum. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id; escape como segmento de URL."
+          }
+        ]
+      }
+    },
+    "/v1/data/chat_messages": {
+      "get": {
+        "operationId": "get_v1_data_chat_messages",
+        "summary": "Ler chat_messages",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Ordenação por created_at e id. Perfil retorna objeto; demais coleções retornam lista.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/chat_messagesRecord"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            },
+            "description": ""
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": ""
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": ""
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "thread_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          }
+        ]
+      }
+    },
+    "/v1/data/chat_messages/{id}": {
+      "get": {
+        "operationId": "get_v1_data_chat_messages_id",
+        "summary": "Ler chat_messages pela chave",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. ",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/chat_messagesRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id. Para profiles, somente ID da sessão."
+          }
+        ]
+      }
+    },
+    "/v1/data/push_tokens": {
+      "get": {
+        "operationId": "get_v1_data_push_tokens",
+        "summary": "Ler push_tokens",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Ordenação por updated_at e token. Perfil retorna objeto; demais coleções retornam lista.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/push_tokensRecord"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            },
+            "description": ""
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": ""
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": ""
+          },
+          {
+            "name": "platform",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          }
+        ]
+      },
+      "post": {
+        "operationId": "post_v1_data_push_tokens",
+        "summary": "POST push_tokens",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: token platform. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "201": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/push_tokensRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "additionalProperties": false,
+                "minProperties": 1,
+                "required": [
+                  "token"
+                ]
+              },
+              "example": {
+                "token": "ExponentPushToken[exemplo]",
+                "platform": "android"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/data/push_tokens/{id}": {
+      "get": {
+        "operationId": "get_v1_data_push_tokens_id",
+        "summary": "Ler push_tokens pela chave",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. ",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/push_tokensRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave token. Para profiles, somente ID da sessão."
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "patch_v1_data_push_tokens_id",
+        "summary": "PATCH push_tokens",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: token platform. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/push_tokensRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave token; escape como segmento de URL."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/push_tokensWrite"
+              },
+              "example": {
+                "token": "ExponentPushToken[exemplo]",
+                "platform": "android"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete_v1_data_push_tokens_id",
+        "summary": "DELETE push_tokens",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: token platform. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave token; escape como segmento de URL."
+          }
+        ]
+      }
+    },
+    "/v1/data/reminder_events": {
+      "get": {
+        "operationId": "get_v1_data_reminder_events",
+        "summary": "Ler reminder_events",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Ordenação por sent_at e id. Perfil retorna objeto; demais coleções retornam lista.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/reminder_eventsRecord"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            },
+            "description": ""
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": ""
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": ""
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "plant_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          },
+          {
+            "name": "read_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          }
+        ]
+      }
+    },
+    "/v1/data/reminder_events/{id}": {
+      "get": {
+        "operationId": "get_v1_data_reminder_events_id",
+        "summary": "Ler reminder_events pela chave",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. ",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/reminder_eventsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id. Para profiles, somente ID da sessão."
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "patch_v1_data_reminder_events_id",
+        "summary": "PATCH reminder_events",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Campos editáveis: read_at. Veja docs/api.md e migrations para tipos, obrigatoriedade e regras de negócio.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/reminder_eventsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id; escape como segmento de URL."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/reminder_eventsWrite"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/data/announcements": {
+      "get": {
+        "operationId": "get_v1_data_announcements",
+        "summary": "Ler announcements",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Ordenação por starts_at e id. Perfil retorna objeto; demais coleções retornam lista.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/announcementsRecord"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            },
+            "description": ""
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": ""
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": ""
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          }
+        ]
+      }
+    },
+    "/v1/data/announcements/{id}": {
+      "get": {
+        "operationId": "get_v1_data_announcements_id",
+        "summary": "Ler announcements pela chave",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. ",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/announcementsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave id. Para profiles, somente ID da sessão."
+          }
+        ]
+      }
+    },
+    "/v1/data/ad_rewards": {
+      "get": {
+        "operationId": "get_v1_data_ad_rewards",
+        "summary": "Ler ad_rewards",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Ordenação por credited_at e transaction_id. Perfil retorna objeto; demais coleções retornam lista.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ad_rewardsRecord"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            },
+            "description": ""
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": ""
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": ""
+          },
+          {
+            "name": "transaction_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          }
+        ]
+      }
+    },
+    "/v1/data/ad_rewards/{id}": {
+      "get": {
+        "operationId": "get_v1_data_ad_rewards_id",
+        "summary": "Ler ad_rewards pela chave",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. ",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ad_rewardsRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave transaction_id. Para profiles, somente ID da sessão."
+          }
+        ]
+      }
+    },
+    "/v1/data/credit_purchases": {
+      "get": {
+        "operationId": "get_v1_data_credit_purchases",
+        "summary": "Ler credit_purchases",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. Ordenação por credited_at e transaction_id. Perfil retorna objeto; demais coleções retornam lista.",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/credit_purchasesRecord"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            },
+            "description": ""
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": ""
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": ""
+          },
+          {
+            "name": "transaction_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro de igualdade; string null testa SQL IS NULL."
+          }
+        ]
+      }
+    },
+    "/v1/data/credit_purchases/{id}": {
+      "get": {
+        "operationId": "get_v1_data_credit_purchases_id",
+        "summary": "Ler credit_purchases pela chave",
+        "tags": [
+          "Dados"
+        ],
+        "description": "Somente registros autorizados para a sessão. Campos retornados preservam os nomes do banco. Não envie user_id. ",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/credit_purchasesRecord"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Chave transaction_id. Para profiles, somente ID da sessão."
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Cole somente o access_token de uma sessão Broto. Não use chaves de provedores."
+      }
+    },
+    "schemas": {
+      "Analysis": {
+        "type": "object",
+        "properties": {
+          "especie": {
+            "type": "object",
+            "properties": {
+              "comum": {
+                "type": "string"
+              },
+              "cientifico": {
+                "type": "string"
+              },
+              "confianca": {
+                "type": "number",
+                "description": "de 0 a 1, honesto e nao inflado"
+              }
+            },
+            "required": [
+              "comum",
+              "cientifico",
+              "confianca"
+            ],
+            "additionalProperties": false,
+            "nullable": true
+          },
+          "saude": {
+            "type": "string",
+            "enum": [
+              "saudavel",
+              "atencao",
+              "problema"
+            ]
+          },
+          "diagnostico": {
+            "type": "array",
+            "description": "no maximo 3 causas, uma hipotese por item, da mais provavel para a menos",
+            "items": {
+              "type": "object",
+              "properties": {
+                "causa": {
+                  "type": "string"
+                },
+                "probabilidade": {
+                  "type": "string",
+                  "enum": [
+                    "alta",
+                    "media",
+                    "baixa"
+                  ]
+                },
+                "sinais": {
+                  "type": "string"
+                },
+                "acao": {
+                  "type": "string"
+                },
+                "marcacao": {
+                  "type": "object",
+                  "description": "onde o sintoma aparece na foto, ou null",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "description": "centro horizontal, 0 a 1"
+                    },
+                    "y": {
+                      "type": "number",
+                      "description": "centro vertical, 0 a 1, topo e 0"
+                    },
+                    "raio": {
+                      "type": "number",
+                      "description": "fracao da largura, 0.08 a 0.20"
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "raio"
+                  ],
+                  "additionalProperties": false,
+                  "nullable": true
+                }
+              },
+              "required": [
+                "causa",
+                "probabilidade",
+                "sinais",
+                "acao",
+                "marcacao"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "cuidados": {
+            "type": "object",
+            "properties": {
+              "rega_dias": {
+                "type": "integer",
+                "description": "intervalo entre regas, de 1 a 60 dias"
+              },
+              "luz": {
+                "type": "string",
+                "enum": [
+                  "sol_direto",
+                  "sol_parcial",
+                  "luz_indireta",
+                  "meia_sombra",
+                  "sombra"
+                ]
+              },
+              "luz_nota": {
+                "type": "string",
+                "description": "uma frase completa com ponto final, ou vazio"
+              },
+              "adubo": {
+                "type": "string",
+                "enum": [
+                  "quinzenal",
+                  "mensal",
+                  "bimestral",
+                  "estacional",
+                  "nao_precisa"
+                ]
+              },
+              "adubo_nota": {
+                "type": "string",
+                "description": "uma frase completa com ponto final, ou vazio"
+              },
+              "vaporizar_dias": {
+                "type": "integer",
+                "description": "intervalo entre vaporizações, de 1 a 15 dias; null quando a espécie não precisa",
+                "nullable": true
+              },
+              "girar_dias": {
+                "type": "integer",
+                "description": "intervalo para girar o vaso, de 7 a 60 dias"
+              },
+              "replantar_meses": {
+                "type": "integer",
+                "description": "intervalo para trocar de vaso, de 6 a 48 meses"
+              },
+              "podar_mes": {
+                "type": "integer",
+                "description": "mês do ano em que a poda deve ser feita, de 1 a 12; null quando a espécie não é podada",
+                "nullable": true
+              }
+            },
+            "required": [
+              "rega_dias",
+              "luz",
+              "luz_nota",
+              "adubo",
+              "adubo_nota",
+              "vaporizar_dias",
+              "girar_dias",
+              "replantar_meses",
+              "podar_mes"
+            ],
+            "additionalProperties": false,
+            "nullable": true
+          },
+          "toxica_para_pets": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "temperatura": {
+            "type": "object",
+            "properties": {
+              "min_c": {
+                "type": "integer",
+                "description": "menor temperatura confortável, em Celsius"
+              },
+              "max_c": {
+                "type": "integer",
+                "description": "maior temperatura confortável, em Celsius"
+              },
+              "nota": {
+                "type": "string",
+                "description": "uma frase completa com ponto final"
+              }
+            },
+            "required": [
+              "min_c",
+              "max_c",
+              "nota"
+            ],
+            "additionalProperties": false,
+            "nullable": true
+          },
+          "cultivo": {
+            "type": "string",
+            "description": "duas a quatro frases sobre como multiplicar e manter",
+            "nullable": true
+          },
+          "simbolismo": {
+            "type": "string",
+            "description": "atribuição cultural declarada como atribuição, ou string vazia",
+            "nullable": true
+          },
+          "como_confirmar": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "causa": {
+                  "type": "string"
+                },
+                "teste": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "causa",
+                "teste"
+              ],
+              "additionalProperties": false
+            },
+            "nullable": true
+          },
+          "identification_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "especie",
+          "saude",
+          "diagnostico",
+          "cuidados",
+          "toxica_para_pets",
+          "temperatura",
+          "cultivo",
+          "simbolismo",
+          "como_confirmar",
+          "identification_id"
+        ]
+      },
+      "SpeciesFacts": {
+        "type": "object",
+        "properties": {
+          "cuidados": {
+            "type": "object",
+            "properties": {
+              "rega_dias": {
+                "type": "integer",
+                "description": "intervalo entre regas, de 1 a 60 dias"
+              },
+              "luz": {
+                "type": "string",
+                "enum": [
+                  "sol_direto",
+                  "sol_parcial",
+                  "luz_indireta",
+                  "meia_sombra",
+                  "sombra"
+                ]
+              },
+              "luz_nota": {
+                "type": "string",
+                "description": "uma frase completa com ponto final, ou vazio"
+              },
+              "adubo": {
+                "type": "string",
+                "enum": [
+                  "quinzenal",
+                  "mensal",
+                  "bimestral",
+                  "estacional",
+                  "nao_precisa"
+                ]
+              },
+              "adubo_nota": {
+                "type": "string",
+                "description": "uma frase completa com ponto final, ou vazio"
+              },
+              "vaporizar_dias": {
+                "type": "integer",
+                "description": "intervalo entre vaporizações, de 1 a 15 dias; null quando a espécie não precisa",
+                "nullable": true
+              },
+              "girar_dias": {
+                "type": "integer",
+                "description": "intervalo para girar o vaso, de 7 a 60 dias"
+              },
+              "replantar_meses": {
+                "type": "integer",
+                "description": "intervalo para trocar de vaso, de 6 a 48 meses"
+              },
+              "podar_mes": {
+                "type": "integer",
+                "description": "mês do ano em que a poda deve ser feita, de 1 a 12; null quando a espécie não é podada",
+                "nullable": true
+              }
+            },
+            "required": [
+              "rega_dias",
+              "luz",
+              "luz_nota",
+              "adubo",
+              "adubo_nota",
+              "vaporizar_dias",
+              "girar_dias",
+              "replantar_meses",
+              "podar_mes"
+            ],
+            "additionalProperties": false
+          },
+          "toxica_para_pets": {
+            "type": "boolean"
+          },
+          "temperatura": {
+            "type": "object",
+            "properties": {
+              "min_c": {
+                "type": "integer",
+                "description": "menor temperatura confortável, em Celsius"
+              },
+              "max_c": {
+                "type": "integer",
+                "description": "maior temperatura confortável, em Celsius"
+              },
+              "nota": {
+                "type": "string",
+                "description": "uma frase completa com ponto final"
+              }
+            },
+            "required": [
+              "min_c",
+              "max_c",
+              "nota"
+            ],
+            "additionalProperties": false
+          },
+          "cultivo": {
+            "type": "string",
+            "description": "duas a quatro frases sobre como multiplicar e manter"
+          },
+          "simbolismo": {
+            "type": "string",
+            "description": "atribuição cultural declarada como atribuição, ou string vazia"
+          }
+        },
+        "required": [
+          "cuidados",
+          "toxica_para_pets",
+          "temperatura",
+          "cultivo",
+          "simbolismo"
+        ],
+        "additionalProperties": false
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "erro": {
+            "type": "string"
+          },
+          "cap": {
+            "type": "integer"
+          },
+          "limite": {
+            "type": "integer"
+          },
+          "motivo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "erro"
+        ]
+      },
+      "OK": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "email_confirmed_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "user_metadata": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "Session": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "token_type": {
+            "type": "string",
+            "enum": [
+              "bearer"
+            ]
+          },
+          "expires_in": {
+            "type": "integer"
+          },
+          "expires_at": {
+            "type": "integer"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": [
+          "access_token",
+          "token_type",
+          "expires_in",
+          "expires_at",
+          "user"
+        ]
+      },
+      "profilesRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan": {
+            "type": "string",
+            "enum": [
+              "free",
+              "pro"
+            ]
+          },
+          "chat_day": {
+            "type": "string",
+            "format": "date"
+          },
+          "language": {
+            "type": "string",
+            "nullable": true
+          },
+          "timezone": {
+            "type": "string",
+            "nullable": true
+          },
+          "ads_today": {
+            "type": "integer"
+          },
+          "free_used": {
+            "type": "integer"
+          },
+          "ad_credits": {
+            "type": "integer"
+          },
+          "chat_month": {
+            "type": "integer"
+          },
+          "chat_today": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "avatar_path": {
+            "type": "string",
+            "nullable": true
+          },
+          "chat_period": {
+            "type": "string",
+            "nullable": true
+          },
+          "plan_period": {
+            "type": "string",
+            "nullable": true
+          },
+          "analyses_day": {
+            "type": "string",
+            "format": "date"
+          },
+          "display_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "paid_credits": {
+            "type": "integer"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date"
+          },
+          "accepted_tips": {
+            "type": "boolean"
+          },
+          "reminder_time": {
+            "type": "string",
+            "example": "09:00:00"
+          },
+          "terms_version": {
+            "type": "string",
+            "nullable": true
+          },
+          "ads_today_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "analyses_month": {
+            "type": "integer"
+          },
+          "analyses_today": {
+            "type": "integer"
+          },
+          "chat_expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "plan_expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "welcome_credits": {
+            "type": "integer"
+          },
+          "accepted_tips_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "revoked_terms_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "temperature_unit": {
+            "type": "string",
+            "nullable": true
+          },
+          "accepted_terms_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "notifications_enabled": {
+            "type": "boolean"
+          },
+          "dismissed_announcement": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        }
+      },
+      "profilesWrite": {
+        "type": "object",
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "avatar_path": {
+            "type": "string",
+            "nullable": true
+          },
+          "timezone": {
+            "type": "string",
+            "nullable": true
+          },
+          "reminder_time": {
+            "type": "string",
+            "example": "09:00:00"
+          },
+          "notifications_enabled": {
+            "type": "boolean"
+          },
+          "accepted_terms_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "terms_version": {
+            "type": "string",
+            "nullable": true
+          },
+          "accepted_tips": {
+            "type": "boolean"
+          },
+          "accepted_tips_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "temperature_unit": {
+            "type": "string",
+            "nullable": true
+          },
+          "dismissed_announcement": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "revoked_terms_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "language": {
+            "type": "string",
+            "nullable": true
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "minProperties": 1
+      },
+      "plantsRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "room": {
+            "type": "string",
+            "nullable": true
+          },
+          "light": {
+            "type": "string",
+            "nullable": true
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "group_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "mist_days": {
+            "type": "integer",
+            "nullable": true
+          },
+          "care_notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fertilizer": {
+            "type": "string",
+            "nullable": true
+          },
+          "light_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "photo_path": {
+            "type": "string",
+            "nullable": true
+          },
+          "temp_max_c": {
+            "type": "integer",
+            "nullable": true
+          },
+          "temp_min_c": {
+            "type": "integer",
+            "nullable": true
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "archived_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "prune_month": {
+            "type": "integer",
+            "nullable": true
+          },
+          "rotate_days": {
+            "type": "integer",
+            "nullable": true
+          },
+          "repot_months": {
+            "type": "integer",
+            "nullable": true
+          },
+          "toxic_to_pets": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "species_common": {
+            "type": "string",
+            "nullable": true
+          },
+          "fertilizer_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "last_watered_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "notify_watering": {
+            "type": "boolean"
+          },
+          "species_scientific": {
+            "type": "string",
+            "nullable": true
+          },
+          "watering_interval_days": {
+            "type": "integer",
+            "nullable": true
+          }
+        }
+      },
+      "plantsWrite": {
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string"
+          },
+          "species_scientific": {
+            "type": "string",
+            "nullable": true
+          },
+          "species_common": {
+            "type": "string",
+            "nullable": true
+          },
+          "photo_path": {
+            "type": "string",
+            "nullable": true
+          },
+          "room": {
+            "type": "string",
+            "nullable": true
+          },
+          "watering_interval_days": {
+            "type": "integer",
+            "nullable": true
+          },
+          "light": {
+            "type": "string",
+            "nullable": true
+          },
+          "care_notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "last_watered_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "notify_watering": {
+            "type": "boolean"
+          },
+          "archived_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "group_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "fertilizer": {
+            "type": "string",
+            "nullable": true
+          },
+          "light_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "fertilizer_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "toxic_to_pets": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mist_days": {
+            "type": "integer",
+            "nullable": true
+          },
+          "rotate_days": {
+            "type": "integer",
+            "nullable": true
+          },
+          "repot_months": {
+            "type": "integer",
+            "nullable": true
+          },
+          "prune_month": {
+            "type": "integer",
+            "nullable": true
+          },
+          "temp_min_c": {
+            "type": "integer",
+            "nullable": true
+          },
+          "temp_max_c": {
+            "type": "integer",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "minProperties": 1
+      },
+      "plant_groupsRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "plant_groupsWrite": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "minProperties": 1
+      },
+      "plant_tasksRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "next_at": {
+            "type": "string",
+            "format": "date"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "remind_at": {
+            "type": "string",
+            "example": "09:00:00",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "interval_days": {
+            "type": "integer"
+          }
+        }
+      },
+      "plant_tasksWrite": {
+        "type": "object",
+        "properties": {
+          "plant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "interval_days": {
+            "type": "integer"
+          },
+          "next_at": {
+            "type": "string",
+            "format": "date"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "remind_at": {
+            "type": "string",
+            "example": "09:00:00",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "minProperties": 1
+      },
+      "care_eventsRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "happened_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "care_eventsWrite": {
+        "type": "object",
+        "properties": {
+          "plant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "happened_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "minProperties": 1
+      },
+      "identificationsRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string",
+            "nullable": true
+          },
+          "result": {},
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plant_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "confidence": {
+            "type": "number",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "photo_path": {
+            "type": "string"
+          },
+          "cost_micros": {
+            "type": "integer",
+            "nullable": true
+          },
+          "resolved_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "was_helpful": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "corrected_species": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "identificationsWrite": {
+        "type": "object",
+        "properties": {
+          "plant_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "corrected_species": {
+            "type": "string",
+            "nullable": true
+          },
+          "was_helpful": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "resolved_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "minProperties": 1
+      },
+      "chat_threadsRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plant_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_message_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "chat_threadsWrite": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false,
+        "minProperties": 1
+      },
+      "chat_messagesRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "thread_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "chat_messagesWrite": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false,
+        "minProperties": 1
+      },
+      "push_tokensRecord": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "platform": {
+            "type": "string",
+            "nullable": true
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "push_tokensWrite": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "minProperties": 1
+      },
+      "reminder_eventsRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "body": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "read_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "sent_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plant_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        }
+      },
+      "reminder_eventsWrite": {
+        "type": "object",
+        "properties": {
+          "read_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "minProperties": 1
+      },
+      "announcementsRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "body": {},
+          "kind": {
+            "type": "string"
+          },
+          "title": {},
+          "detail": {},
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "notify_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "announcementsWrite": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false,
+        "minProperties": 1
+      },
+      "ad_rewardsRecord": {
+        "type": "object",
+        "properties": {
+          "ad_unit": {
+            "type": "string",
+            "nullable": true
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "credited_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "transaction_id": {
+            "type": "string"
+          }
+        }
+      },
+      "ad_rewardsWrite": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false,
+        "minProperties": 1
+      },
+      "credit_purchasesRecord": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "product_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "credited_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "transaction_id": {
+            "type": "string"
+          }
+        }
+      },
+      "credit_purchasesWrite": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false,
+        "minProperties": 1
+      }
+    },
+    "responses": {
+      "Error": {
+        "description": "Erro JSON: 400 entrada inválida; 401 sessão; 402 créditos/plano; 403 acesso/origem; 404 inexistente; 409 conflito; 429 limite; 500 erro interno; 502 provedor de IA; 503 integração/banco/concorrência; 507 quota de fotos. Consulte erro para o código específico.",
+        "headers": {
+          "Retry-After": {
+            "description": "Segundos até nova tentativa quando aplicável",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "erro": "sem_token"
+            }
+          }
+        }
+      }
+    }
+  }
+}

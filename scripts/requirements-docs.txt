@@ -1,0 +1,2 @@
+# Tooling only; never included in the production Docker image.
+openapi-spec-validator==0.7.2

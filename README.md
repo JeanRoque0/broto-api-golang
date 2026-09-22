@@ -95,3 +95,11 @@ Em AWS, `STORAGE_BUCKET`/`AWS_REGION` ativam S3; o IAM da task substitui access 
 `.github/workflows/deploy.yml` roda CI, faz build/push no ECR e deploy via OIDC. O deploy permanece desativado até a repository variable `DEPLOY_ENABLED=true`; configure as environment variables do Terraform e proteja o environment `production` para main. Não há secrets no YAML. O script `scripts/deploy/deploy.py` exige digest imutável, executa migrations e detecta rollback do ECS.
 
 Validação adicional: `python3 -m unittest discover -s scripts/deploy -p 'test_*.py'`. Testes de assinatura CDN, confiança no proxy, pool/runtime sem DDL, S3 compartilhado e fila de exclusão rodam junto à integração; não contatam serviços pagos. O fluxo real OIDC → ECR → ECS → CloudFront ainda exige infraestrutura provisionada, domínio e secrets configurados.
+
+## Documentação HTTP e Swagger
+
+- [Contrato de rotas](docs/api.md): autenticação, CRUD, fotos, IA, limites e exemplos.
+- Swagger local: **http://localhost:8080/docs/** (também `/swagger`).
+- OpenAPI: **http://localhost:8080/openapi.json**, [arquivo versionado](internal/api/docs/openapi.json).
+
+A interface vem no binário e usa sessão Bearer em **Authorize**. Configure `PUBLIC_URL` para o endereço real da API. No ingresso AWS provisório sem certificado, continuam acessíveis somente os health checks; as demais rotas exigem concluir a configuração HTTPS.

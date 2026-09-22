@@ -1,0 +1,832 @@
+{
+  "plants": {
+    "id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": true,
+      "nullable": false
+    },
+    "room": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "light": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "user_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": false
+    },
+    "group_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": true
+    },
+    "nickname": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": false
+    },
+    "mist_days": {
+      "udt": "int4",
+      "type": "integer",
+      "default": false,
+      "nullable": true
+    },
+    "care_notes": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "created_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    },
+    "fertilizer": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "light_note": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "photo_path": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "temp_max_c": {
+      "udt": "int4",
+      "type": "integer",
+      "default": false,
+      "nullable": true
+    },
+    "temp_min_c": {
+      "udt": "int4",
+      "type": "integer",
+      "default": false,
+      "nullable": true
+    },
+    "updated_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    },
+    "archived_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": false,
+      "nullable": true
+    },
+    "prune_month": {
+      "udt": "int4",
+      "type": "integer",
+      "default": false,
+      "nullable": true
+    },
+    "rotate_days": {
+      "udt": "int4",
+      "type": "integer",
+      "default": false,
+      "nullable": true
+    },
+    "repot_months": {
+      "udt": "int4",
+      "type": "integer",
+      "default": false,
+      "nullable": true
+    },
+    "toxic_to_pets": {
+      "udt": "bool",
+      "type": "boolean",
+      "default": false,
+      "nullable": true
+    },
+    "species_common": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "fertilizer_note": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "last_watered_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": false,
+      "nullable": true
+    },
+    "notify_watering": {
+      "udt": "bool",
+      "type": "boolean",
+      "default": true,
+      "nullable": false
+    },
+    "species_scientific": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "watering_interval_days": {
+      "udt": "int4",
+      "type": "integer",
+      "default": false,
+      "nullable": true
+    }
+  },
+  "profiles": {
+    "id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": false
+    },
+    "plan": {
+      "udt": "plan_tier",
+      "type": "USER-DEFINED",
+      "default": true,
+      "nullable": false
+    },
+    "chat_day": {
+      "udt": "date",
+      "type": "date",
+      "default": true,
+      "nullable": false
+    },
+    "language": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "timezone": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "ads_today": {
+      "udt": "int4",
+      "type": "integer",
+      "default": true,
+      "nullable": false
+    },
+    "free_used": {
+      "udt": "int4",
+      "type": "integer",
+      "default": true,
+      "nullable": false
+    },
+    "ad_credits": {
+      "udt": "int4",
+      "type": "integer",
+      "default": true,
+      "nullable": false
+    },
+    "chat_month": {
+      "udt": "int4",
+      "type": "integer",
+      "default": true,
+      "nullable": false
+    },
+    "chat_today": {
+      "udt": "int4",
+      "type": "integer",
+      "default": true,
+      "nullable": false
+    },
+    "created_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    },
+    "avatar_path": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "chat_period": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "plan_period": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "analyses_day": {
+      "udt": "date",
+      "type": "date",
+      "default": true,
+      "nullable": false
+    },
+    "display_name": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "last_seen_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": false,
+      "nullable": true
+    },
+    "paid_credits": {
+      "udt": "int4",
+      "type": "integer",
+      "default": true,
+      "nullable": false
+    },
+    "period_start": {
+      "udt": "date",
+      "type": "date",
+      "default": true,
+      "nullable": false
+    },
+    "accepted_tips": {
+      "udt": "bool",
+      "type": "boolean",
+      "default": true,
+      "nullable": false
+    },
+    "reminder_time": {
+      "udt": "time",
+      "type": "time without time zone",
+      "default": true,
+      "nullable": false
+    },
+    "terms_version": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "ads_today_date": {
+      "udt": "date",
+      "type": "date",
+      "default": true,
+      "nullable": false
+    },
+    "analyses_month": {
+      "udt": "int4",
+      "type": "integer",
+      "default": true,
+      "nullable": false
+    },
+    "analyses_today": {
+      "udt": "int4",
+      "type": "integer",
+      "default": true,
+      "nullable": false
+    },
+    "chat_expires_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": false,
+      "nullable": true
+    },
+    "plan_expires_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": false,
+      "nullable": true
+    },
+    "welcome_credits": {
+      "udt": "int4",
+      "type": "integer",
+      "default": true,
+      "nullable": false
+    },
+    "accepted_tips_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": false,
+      "nullable": true
+    },
+    "revoked_terms_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": false,
+      "nullable": true
+    },
+    "temperature_unit": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "accepted_terms_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": false,
+      "nullable": true
+    },
+    "notifications_enabled": {
+      "udt": "bool",
+      "type": "boolean",
+      "default": true,
+      "nullable": false
+    },
+    "dismissed_announcement": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": true
+    }
+  },
+  "ad_rewards": {
+    "ad_unit": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "user_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": false
+    },
+    "credited_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    },
+    "transaction_id": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": false
+    }
+  },
+  "care_events": {
+    "id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": true,
+      "nullable": false
+    },
+    "kind": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": false
+    },
+    "note": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "user_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": false
+    },
+    "plant_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": false
+    },
+    "happened_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    }
+  },
+  "plant_tasks": {
+    "id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": true,
+      "nullable": false
+    },
+    "kind": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": false
+    },
+    "enabled": {
+      "udt": "bool",
+      "type": "boolean",
+      "default": true,
+      "nullable": false
+    },
+    "next_at": {
+      "udt": "date",
+      "type": "date",
+      "default": false,
+      "nullable": false
+    },
+    "user_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": false
+    },
+    "plant_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": false
+    },
+    "remind_at": {
+      "udt": "time",
+      "type": "time without time zone",
+      "default": false,
+      "nullable": true
+    },
+    "created_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    },
+    "interval_days": {
+      "udt": "int4",
+      "type": "integer",
+      "default": false,
+      "nullable": false
+    }
+  },
+  "push_tokens": {
+    "token": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": false
+    },
+    "user_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": false
+    },
+    "platform": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "updated_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    }
+  },
+  "chat_threads": {
+    "id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": true,
+      "nullable": false
+    },
+    "title": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "user_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": false
+    },
+    "plant_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": true
+    },
+    "created_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    },
+    "last_message_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    }
+  },
+  "plant_groups": {
+    "id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": true,
+      "nullable": false
+    },
+    "name": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": false
+    },
+    "user_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": false
+    },
+    "created_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    }
+  },
+  "announcements": {
+    "id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": true,
+      "nullable": false
+    },
+    "body": {
+      "udt": "jsonb",
+      "type": "jsonb",
+      "default": false,
+      "nullable": false
+    },
+    "kind": {
+      "udt": "text",
+      "type": "text",
+      "default": true,
+      "nullable": false
+    },
+    "title": {
+      "udt": "jsonb",
+      "type": "jsonb",
+      "default": false,
+      "nullable": false
+    },
+    "detail": {
+      "udt": "jsonb",
+      "type": "jsonb",
+      "default": false,
+      "nullable": true
+    },
+    "ends_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": false,
+      "nullable": true
+    },
+    "notify_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": false,
+      "nullable": true
+    },
+    "starts_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    },
+    "created_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    }
+  },
+  "chat_messages": {
+    "id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": true,
+      "nullable": false
+    },
+    "role": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": false
+    },
+    "content": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": false
+    },
+    "user_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": false
+    },
+    "thread_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": false
+    },
+    "created_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    }
+  },
+  "identifications": {
+    "id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": true,
+      "nullable": false
+    },
+    "kind": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": false
+    },
+    "model": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "result": {
+      "udt": "jsonb",
+      "type": "jsonb",
+      "default": false,
+      "nullable": false
+    },
+    "user_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": false
+    },
+    "plant_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": true
+    },
+    "confidence": {
+      "udt": "numeric",
+      "type": "numeric",
+      "default": false,
+      "nullable": true
+    },
+    "created_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    },
+    "photo_path": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": false
+    },
+    "cost_micros": {
+      "udt": "int4",
+      "type": "integer",
+      "default": false,
+      "nullable": true
+    },
+    "resolved_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": false,
+      "nullable": true
+    },
+    "was_helpful": {
+      "udt": "bool",
+      "type": "boolean",
+      "default": false,
+      "nullable": true
+    },
+    "corrected_species": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    }
+  },
+  "reminder_events": {
+    "id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": true,
+      "nullable": false
+    },
+    "body": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": false
+    },
+    "kind": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": false
+    },
+    "title": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": false
+    },
+    "read_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": false,
+      "nullable": true
+    },
+    "sent_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    },
+    "user_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": false
+    },
+    "plant_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": true
+    }
+  },
+  "credit_purchases": {
+    "user_id": {
+      "udt": "uuid",
+      "type": "uuid",
+      "default": false,
+      "nullable": false
+    },
+    "quantity": {
+      "udt": "int4",
+      "type": "integer",
+      "default": false,
+      "nullable": false
+    },
+    "product_id": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": true
+    },
+    "credited_at": {
+      "udt": "timestamptz",
+      "type": "timestamp with time zone",
+      "default": true,
+      "nullable": false
+    },
+    "transaction_id": {
+      "udt": "text",
+      "type": "text",
+      "default": false,
+      "nullable": false
+    }
+  }
+}

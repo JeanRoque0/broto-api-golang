@@ -4,6 +4,32 @@ Base local: `http://localhost:8080`. Envie `Authorization: Bearer <access_token>
 
 Se a consulta de sessão falhar por erro no banco, a rota privada retorna 503/`banco_indisponivel`. O cliente deve permitir nova tentativa e preservar a sessão; esse erro não indica token expirado.
 
+## Swagger e OpenAPI
+
+Com a API executando, abra **http://localhost:8080/docs/** (`/swagger` redireciona para essa página). O contrato para importar no Postman/Insomnia está em **http://localhost:8080/openapi.json** e no arquivo [openapi.json](../internal/api/docs/openapi.json).
+
+O Swagger é servido pelo próprio backend, inclusive JavaScript e CSS, sem CDN ou serviço de validação externo. Os arquivos comprimidos ficam embutidos no binário de produção. A interface usa o mesmo servidor que a página; `PUBLIC_URL` deve corresponder ao endereço público da API. Essa origem e as origens explícitas de `CORS_ORIGINS` são aceitas; cabeçalhos Host enviados pelo cliente não ampliam a lista.
+
+Para testar:
+
+1. Faça `POST /v1/auth/login` com uma conta existente e copie `access_token`.
+2. Clique em **Authorize**, cole apenas o token e confirme.
+3. Use **Try it out** nas rotas privadas. O navegador não persiste a autorização entre recarregamentos.
+
+As chamadas são reais: exclusões removem dados, SMTP pode enviar e-mails e IA pode gerar cobrança. Use contas e dados de teste. Google OAuth exige o fluxo de navegador/PKCE descrito em [google-auth.md](google-auth.md), não apenas executar seu callback no Swagger.
+
+No ALB provisório **sem HTTPS**, apenas as rotas de saúde estão liberadas. O Swagger está incluído na aplicação, mas o acesso público às demais rotas depende da configuração de HTTPS no ingresso. Localmente, a interface está disponível na porta 8080.
+
+## Saúde
+
+| Método e rota | Retorno |
+|---|---|
+| `GET /livez` | 200 `{ok:true}` enquanto o processo atende HTTP |
+| `GET /readyz` | 200 com PostgreSQL acessível; 503 `{erro:"banco_indisponivel"}` em falha |
+| `GET /healthz` | Alias de readiness |
+
+Essas rotas são públicas e não ocupam a fila limitada de requisições. A API pode responder 503/`servidor_ocupado` com `Retry-After: 1` quando essa fila estiver cheia. Rotas privadas possuem limite por usuário de 120 requisições por minuto por processo.
+
 ## Autenticação
 
 Para login Google direto, veja [o contrato OAuth](google-auth.md): `/v1/auth/google/start`, `/authorize`, `/callback` e `/exchange`. A sessão final tem o mesmo formato do login por senha. Apple não está implementado.
@@ -52,9 +78,9 @@ Filtros são igualdade: `?plant_id=<uuid>`, `?thread_id=<uuid>`, `?archived_at=n
 
 ## Fotos
 
-1. `POST /v1/photos` com JPEG/PNG/WebP binário → 201 `{path:"<user-id>/<random>.jpg"}`.
+1. `POST /v1/photos` com JPEG/PNG/WebP binário de até 8 MiB (sem multipart) → 201 `{path:"<user-id>/<random>.jpg"}`.
 2. Guarde `path` em `plants.photo_path`, `profiles.avatar_path` ou envie a `identify`.
-3. `POST /v1/photos/sign` com `{path}` → `{signedUrl,expiresIn:3600}`.
+3. `POST /v1/photos/sign` com `{path}` → `{signedUrl,expiresIn} (300 segundos via CloudFront; 3600 no armazenamento local)`.
 4. `GET` na URL assinada não precisa do header de sessão.
 5. `DELETE /v1/photos` com `{path}` apaga uma foto sem referências. Remova o vínculo primeiro se receber 409.
 
@@ -114,3 +140,18 @@ Em análise, confira também `data.erro` mesmo quando HTTP = 200. Para completar
 - `POST /v1/reminders/read`: marca todos os lembretes próprios como lidos, sem corpo, e retorna `{ok:true,updated}`. Repetir é seguro.
 
 Veja [o comparativo com o app](frontend-compatibility.md) para sessão, OAuth e exportação.
+
+## Manutenção do contrato
+
+`internal/api/docs/openapi.json` é um artefato versionado: descreve 56 caminhos e 78 operações, incluindo aliases. Os schemas de dados incluem campos, tipos e nulabilidade; os corpos de escrita restringem os campos à allowlist real de `data.go`. Restrições adicionais de negócio estão nos handlers e migrations. JSONB permanece flexível, pois contém conteúdo variável.
+
+```sh
+python3 scripts/generate-openapi.py
+python3 scripts/generate-openapi.py --check
+# Com scripts/requirements-docs.txt instalado em um ambiente Python:
+python3 -m openapi_spec_validator internal/api/docs/openapi.json
+```
+
+Ao mudar colunas públicas, atualize `docs/data-columns.json` usando `scripts/export-doc-columns.sh` contra o PostgreSQL local já migrado; ele exporta somente metadados das 13 tabelas expostas, sem registros ou credenciais. Depois, regenere o OpenAPI. A integração compara esse snapshot com um banco criado do zero pelas migrations; o CI verifica geração e validade OpenAPI. Ao adicionar rotas fora do CRUD, atualize também o gerador e a documentação descritiva.
+
+Os testes cobrem publicação dos arquivos, conteúdo comprimido, proteção das rotas documentadas, allowlists de escrita, metadados do banco e uma escrita autenticada com a origem do Swagger. Não enviam e-mails nem fazem chamadas de IA reais.

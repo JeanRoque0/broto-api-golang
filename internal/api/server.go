@@ -208,6 +208,7 @@ func (s *Server) allow(key string, max int) bool {
 }
 func (s *Server) Routes() http.Handler {
 	m := http.NewServeMux()
+	registerDocumentation(m)
 	m.HandleFunc("GET /livez", func(w http.ResponseWriter, r *http.Request) { send(w, 200, map[string]bool{"ok": true}) })
 	ready := func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
@@ -265,7 +266,7 @@ func (s *Server) Routes() http.Handler {
 		}
 		origin := r.Header.Get("Origin")
 		if origin != "" {
-			ok := false
+			ok := origin == publicOrigin(s.C.PublicURL)
 			for _, v := range strings.Split(s.C.Origins, ",") {
 				if strings.TrimSpace(v) == origin {
 					ok = true
