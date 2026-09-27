@@ -5556,6 +5556,11 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
+          },
+          "trial_ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         }
       },

@@ -191,3 +191,13 @@ func TestRunJobsCancellation(t *testing.T) {
 		t.Fatal("scheduler did not stop after cancellation")
 	}
 }
+
+func TestDisabledJobsDoesNotStartWorker(t *testing.T) {
+	done := make(chan struct{})
+	go func() { (&Server{C: Config{DisableJobs: true}}).RunJobs(context.Background()); close(done) }()
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("disabled worker should return without database access")
+	}
+}

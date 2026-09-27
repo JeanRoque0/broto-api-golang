@@ -12,7 +12,7 @@ type Config struct {
 	CDNURL, CDNKeyID, CDNPrivateKey                                           string
 	StorageBucket, AWSRegion                                                  string
 	DBMaxConns, MaxRequests                                                   int
-	DisableMigrations                                                         bool
+	DisableMigrations, DisableJobs                                            bool
 	TrustedProxyCIDRs                                                         string
 	ChatMaxTokens, SMTPMinIntervalSeconds                                     int
 	DatabaseURL, Address, StorageDir, SigningKey, PublicURL, SiteURL, Origins string
@@ -47,6 +47,11 @@ func LoadConfig() (Config, error) {
 	}
 	c.AWSRegion = os.Getenv("AWS_REGION")
 	c.DisableMigrations = env("AUTO_MIGRATE", "true") == "false"
+	jobsEnabled, jobsError := strconv.ParseBool(env("JOBS_ENABLED", "true"))
+	if jobsError != nil {
+		return c, errors.New("invalid JOBS_ENABLED")
+	}
+	c.DisableJobs = !jobsEnabled
 	c.TrustedProxyCIDRs = os.Getenv("TRUSTED_PROXY_CIDRS")
 	if _, e := parseTrustedProxies(c.TrustedProxyCIDRs); e != nil {
 		return c, e

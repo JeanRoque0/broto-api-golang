@@ -34,6 +34,7 @@ services:
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
       STORAGE_DIR: /data/photos
       STORAGE_QUOTA_BYTES: ${STORAGE_QUOTA_BYTES:-536870912}
+      JOBS_ENABLED: ${JOBS_ENABLED:-true}
       DEV_AUTO_CONFIRM: ${DEV_AUTO_CONFIRM:-false}
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
       VISION_MODEL: ${VISION_MODEL:-deepseek-flash}

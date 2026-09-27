@@ -14,6 +14,9 @@ import (
 )
 
 func (s *Server) RunJobs(ctx context.Context) {
+	if s.C.DisableJobs {
+		return
+	}
 	ticker := time.NewTicker(time.Minute)
 	defer ticker.Stop()
 	for {

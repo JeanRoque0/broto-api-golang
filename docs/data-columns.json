@@ -361,6 +361,12 @@
       "type": "uuid",
       "default": false,
       "nullable": true
+    },
+    "trial_ends_at": {
+      "type": "timestamp with time zone",
+      "nullable": true,
+      "default": false,
+      "udt": "timestamptz"
     }
   },
   "ad_rewards": {

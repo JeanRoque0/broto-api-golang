@@ -17,3 +17,9 @@ until docker exec "$name" pg_isready -h 127.0.0.1 -U postgres -d broto_test >/de
 done
 port=$(docker inspect -f '{{(index (index .NetworkSettings.Ports "5432/tcp") 0).HostPort}}' "$name")
 TEST_DATABASE_URL="postgres://postgres:broto_test_only@127.0.0.1:$port/broto_test?sslmode=disable" go test -race ./... -count=1 -timeout=180s "$@"
+
+# Optional importer validation reuses the same disposable PostgreSQL instance.
+if [ -n "${BROTO_MIGRATION_PYTHON:-}" ]; then
+  MIGRATION_TEST_URL="postgres://postgres:broto_test_only@127.0.0.1:$port/broto_test?sslmode=disable" \
+    "$BROTO_MIGRATION_PYTHON" -m unittest discover -s scripts/migration -p 'test_*.py'
+fi

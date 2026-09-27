@@ -16,8 +16,8 @@ jobs:
       - run: python3 scripts/generate-openapi.py --check
       - run: |
           python3 -m venv /tmp/broto-openapi
-          /tmp/broto-openapi/bin/pip install -r scripts/requirements-docs.txt
+          /tmp/broto-openapi/bin/pip install -r scripts/requirements-docs.txt -r scripts/migration/requirements.txt
           /tmp/broto-openapi/bin/python -m openapi_spec_validator internal/api/docs/openapi.json
       - run: go vet ./...
-      - run: sh scripts/test-integration.sh
+      - run: BROTO_MIGRATION_PYTHON=/tmp/broto-openapi/bin/python sh scripts/test-integration.sh
       - run: python3 -m unittest discover -s scripts/deploy -p 'test_*.py'

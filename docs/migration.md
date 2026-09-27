@@ -63,3 +63,7 @@ Nenhuma transferência de produção ou alteração no projeto Supabase foi real
 - O rate limit de HTTP fica em memória por instância, por usuário ou IP direto. Não confia em `X-Forwarded-For` enviado pelo cliente; ajuste proxy confiável e proteção de borda ao publicar.
 - O campo `cost_micros` mantém a tabela de preços presente na origem. Modelo não listado fica com custo zero (não precificado); atualize-a com os preços da sua conta antes de usar esse campo para relatórios financeiros.
 - Cache de busca mantém o orçamento global de 1.000 chamadas mensais da origem. É uma limitação compartilhada por todos os usuários.
+
+## Importador administrativo
+
+A ferramenta em [scripts/migration](../scripts/migration/README.md) exporta um snapshot consistente, copia fotos, ensaia a carga com rollback e importa somente em destino vazio. Configurações, snapshots, hashes de senha e arquivos permanecem fora do Git. A migration `006_import_trial_history.sql` preserva `profiles.trial_ends_at` como histórico, sem conceder novos benefícios. Consulte o relatório operacional da execução para saber quais dados foram efetivamente transferidos.
